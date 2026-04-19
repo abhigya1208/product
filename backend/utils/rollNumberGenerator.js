@@ -1,9 +1,8 @@
 const Student = require('../models/Student');
 
 /**
- * Roll Number Format: YYMMCCCSNN
+ * Roll Number Format: YYCCCSNN
  * YY  = last 2 digits of admission year
- * MM  = month of admission (01-12)
  * CCC = class code (3 digits)
  * S   = section code (0 = A, 1 = B)
  * NN  = serial number (01, 02, ...)
@@ -34,14 +33,12 @@ const SECTION_B_CLASSES = ['4', '5', '6', '7', '8'];
  * @param {string} studentClass - The class (NUR, LKG, UKG, 1-10)
  * @param {string} section - Section A or B
  * @param {Date} admissionDate - The admission date
- * @returns {string} The generated roll number (10 digits)
+ * @returns {string} The generated roll number (8 digits)
  */
 async function generateRollNumber(studentClass, section = 'A', admissionDate = new Date()) {
   const year = admissionDate.getFullYear();
-  const month = admissionDate.getMonth() + 1; // 0-indexed to 1-indexed
 
   const yy = String(year).slice(-2);
-  const mm = String(month).padStart(2, '0');
   const ccc = CLASS_CODES[studentClass];
 
   if (!ccc) {
@@ -59,7 +56,7 @@ async function generateRollNumber(studentClass, section = 'A', admissionDate = n
   }
 
   // Build the prefix (without serial number)
-  const prefix = `${yy}${mm}${ccc}${sectionCode}`;
+  const prefix = `${yy}${ccc}${sectionCode}`;
 
   // Find the highest existing serial number for this prefix
   // Using regex to match the prefix pattern
@@ -75,7 +72,7 @@ async function generateRollNumber(studentClass, section = 'A', admissionDate = n
   }
 
   if (nextSerial > 99) {
-    throw new Error('Maximum students (99) reached for this class/section/month/year combination');
+    throw new Error('Maximum students (99) reached for this class/section/year combination');
   }
 
   const nn = String(nextSerial).padStart(2, '0');

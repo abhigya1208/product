@@ -12,7 +12,7 @@ function ChatSidebar({ chats, activeChat, onSelect, onNewChat, onNewGroup, users
   });
 
   return (
-    <div className="flex flex-col h-full border-r border-gray-100">
+    <div className="flex flex-col h-full md:border-r border-gray-100">
       <div className="p-4 border-b border-gray-100">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-bold text-dark-grey">Messages</h3>
@@ -56,7 +56,7 @@ function ChatSidebar({ chats, activeChat, onSelect, onNewChat, onNewGroup, users
 }
 
 // ─── Chat Window ─────────────────────────────────────────────
-function ChatWindow({ chat, myId, socket }) {
+function ChatWindow({ chat, myId, socket, onBack }) {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('');
   const [typing, setTyping] = useState(false);
@@ -122,12 +122,16 @@ function ChatWindow({ chat, myId, socket }) {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-100 bg-white flex items-center gap-3">
-        <div className="w-9 h-9 rounded-full bg-pastel-green/40 flex items-center justify-center text-base font-bold text-dark-grey">
+      <div className="px-4 py-3 border-b border-gray-100 bg-white flex items-center gap-3 flex-shrink-0">
+        {/* Back button — visible only on mobile */}
+        <button onClick={onBack} className="md:hidden p-1.5 -ml-1 rounded-lg hover:bg-gray-100 text-dark-grey" title="Back to chats">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+        </button>
+        <div className="w-9 h-9 rounded-full bg-pastel-green/40 flex items-center justify-center text-base font-bold text-dark-grey flex-shrink-0">
           {chat.isGroup ? '👥' : chatName.charAt(0).toUpperCase()}
         </div>
-        <div>
-          <p className="font-semibold text-dark-grey text-sm">{chatName}</p>
+        <div className="min-w-0">
+          <p className="font-semibold text-dark-grey text-sm truncate">{chatName}</p>
           {chat.isGroup && <p className="text-xs text-mid-grey">{chat.members?.length} members</p>}
         </div>
       </div>
@@ -139,11 +143,11 @@ function ChatWindow({ chat, myId, socket }) {
           const seen = msg.readBy?.length > 1;
           return (
             <div key={msg._id || i} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[75%] ${isMe ? 'bg-pastel-green text-dark-grey rounded-2xl rounded-br-sm' : 'bg-white text-dark-grey rounded-2xl rounded-bl-sm shadow-soft'} px-4 py-2.5`}>
+              <div className={`max-w-[85%] md:max-w-[75%] ${isMe ? 'bg-pastel-green text-dark-grey rounded-2xl rounded-br-sm' : 'bg-white text-dark-grey rounded-2xl rounded-bl-sm shadow-soft'} px-4 py-2.5`}>
                 {!isMe && chat.isGroup && (
                   <p className="text-xs font-semibold text-mid-grey mb-1">{msg.senderId?.name}</p>
                 )}
-                <p className="text-sm leading-relaxed">{msg.content}</p>
+                <p className="text-sm leading-relaxed break-words">{msg.content}</p>
                 <div className="flex items-center justify-end gap-1 mt-1">
                   <p className="text-[10px] text-mid-grey">{new Date(msg.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</p>
                   {isMe && <span className={`text-[10px] ${seen ? 'text-blue-500' : 'text-mid-grey'}`}>{seen ? '✓✓' : '✓'}</span>}
@@ -163,10 +167,10 @@ function ChatWindow({ chat, myId, socket }) {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
-      <form onSubmit={sendMsg} className="p-3 border-t border-gray-100 bg-white flex gap-2">
+      {/* Input — sticky at bottom */}
+      <form onSubmit={sendMsg} className="p-3 border-t border-gray-100 bg-white flex gap-2 flex-shrink-0">
         <input className="input flex-1 text-sm" placeholder="Type a message…" value={text} onChange={handleType} />
-        <button type="submit" disabled={!text.trim()} className="btn-primary px-4 py-2 text-sm disabled:opacity-50">Send</button>
+        <button type="submit" disabled={!text.trim()} className="btn-primary px-4 py-2 text-sm disabled:opacity-50 flex-shrink-0">Send</button>
       </form>
     </div>
   );
@@ -221,10 +225,13 @@ export default function ChatInterface() {
     setShowNewGroup(false); setGroupName(''); setGroupMembers([]);
   };
 
+  // On mobile: go back from chat window to sidebar
+  const handleBack = () => setActive(null);
+
   return (
     <div className="flex h-[calc(100vh-120px)] bg-white rounded-2xl shadow-card overflow-hidden border border-gray-100">
-      {/* Sidebar */}
-      <div className="w-64 lg:w-72 flex-shrink-0">
+      {/* Sidebar — hidden on mobile when a chat is active */}
+      <div className={`${active ? 'hidden md:flex' : 'flex'} w-full md:w-64 lg:w-72 flex-shrink-0 flex-col`}>
         <ChatSidebar chats={chats} activeChat={{ ...active, myId: user?._id }}
           onSelect={setActive}
           onNewChat={() => { setShowNewChat(s => !s); setShowNewGroup(false); }}
@@ -232,11 +239,11 @@ export default function ChatInterface() {
           users={users} isOnline={isOnline} />
       </div>
 
-      {/* Main area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* Main area — hidden on mobile when no chat is active */}
+      <div className={`${active ? 'flex' : 'hidden md:flex'} flex-1 flex-col min-w-0`}>
         {/* New 1-to-1 panel */}
         {showNewChat && (
-          <div className="p-4 bg-pastel-green/10 border-b border-pastel-green/30">
+          <div className="p-4 bg-pastel-green/10 border-b border-pastel-green/30 flex-shrink-0">
             <p className="text-sm font-semibold mb-2 text-dark-grey">Start a new conversation:</p>
             <div className="flex flex-wrap gap-2">
               {users.filter(u => u.name.toLowerCase().includes(search.toLowerCase())).map(u => (
@@ -254,7 +261,7 @@ export default function ChatInterface() {
 
         {/* New group panel */}
         {showNewGroup && (
-          <form onSubmit={createGroup} className="p-4 bg-blue-50 border-b border-blue-100 space-y-3">
+          <form onSubmit={createGroup} className="p-4 bg-blue-50 border-b border-blue-100 space-y-3 flex-shrink-0">
             <p className="text-sm font-semibold text-dark-grey">Create Group Chat (max 15 members)</p>
             <input className="input text-sm" placeholder="Group name" value={groupName}
               onChange={e => setGroupName(e.target.value)} required />
@@ -273,7 +280,7 @@ export default function ChatInterface() {
 
         {/* Chat window */}
         {active ? (
-          <ChatWindow chat={active} myId={user?._id} socket={socket} />
+          <ChatWindow chat={active} myId={user?._id} socket={socket} onBack={handleBack} />
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-center p-8 text-mid-grey">
             <div className="text-6xl mb-4">💬</div>

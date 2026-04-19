@@ -7,11 +7,13 @@ import PaymentModal from '../components/PaymentModal';
 import AnnouncementsPanel from '../components/AnnouncementsPanel';
 import { downloadReceipt } from '../utils/pdf';
 import { MONTH_NAMES } from '../utils/constants';
+import ChangePassword from '../components/ChangePassword';
 
 const NAV = [
   { id: 'dashboard',     label: 'My Fees',        icon: '💳' },
   { id: 'history',       label: 'Payment History', icon: '📜' },
   { id: 'announcements', label: 'Announcements',   icon: '📢' },
+  { id: 'settings',      label: 'Settings',         icon: '⚙️' },
 ];
 
 export default function StudentDashboard() {
@@ -204,6 +206,7 @@ export default function StudentDashboard() {
           )}
 
           {tab === 'announcements' && <AnnouncementsPanel canCreate={false} />}
+          {tab === 'settings' && <ChangePassword />}
         </main>
       </div>
 

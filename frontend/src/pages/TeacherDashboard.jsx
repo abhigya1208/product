@@ -6,6 +6,7 @@ import StudentForm from '../components/StudentForm';
 import FeeTable from '../components/FeeTable';
 import AnnouncementsPanel from '../components/AnnouncementsPanel';
 import ChatInterface from '../components/ChatInterface';
+import ChangePassword from '../components/ChangePassword';
 import StatsCard from '../components/StatsCard';
 import { CLASSES, MONTH_NAMES, FEE_STRUCTURE } from '../utils/constants';
 
@@ -15,6 +16,7 @@ const NAV = [
   { id: 'pending',       label: 'Pending Fees',  icon: '⚠️' },
   { id: 'announcements', label: 'Announcements', icon: '📢' },
   { id: 'chat',          label: 'Chat',          icon: '💬' },
+  { id: 'settings',      label: 'Settings',      icon: '⚙️' },
 ];
 
 export default function TeacherDashboard() {
@@ -274,6 +276,7 @@ export default function TeacherDashboard() {
 
           {tab === 'announcements' && <AnnouncementsPanel canCreate={true} />}
           {tab === 'chat' && <ChatInterface />}
+          {tab === 'settings' && <ChangePassword />}
         </main>
       </div>
 

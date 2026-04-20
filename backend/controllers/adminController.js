@@ -201,6 +201,92 @@ exports.addStudent = async (req, res) => {
 };
 
 /**
+ * Bulk import students
+ * POST /api/admin/students/bulk-import
+ */
+exports.bulkImportStudents = async (req, res) => {
+  try {
+    const { students } = req.body;
+    if (!students || !Array.isArray(students)) {
+      return res.status(400).json({ message: 'Invalid data format array expected.' });
+    }
+
+    const summary = { success: 0, failed: 0, skipped: 0 };
+    const credentials = [];
+    const errors = [];
+
+    for (let i = 0; i < students.length; i++) {
+      const data = students[i];
+      try {
+        if (!data.name || !data.studentClass) {
+          throw new Error('Name and Class are required.');
+        }
+        
+        let rollNumber = data.rollNumber;
+        const admDate = data.admissionDate ? new Date(data.admissionDate) : new Date();
+
+        if (rollNumber) {
+           const existing = await Student.findOne({ rollNumber });
+           if (existing) {
+             summary.skipped++;
+             continue; // Skip duplicate manually assigned roll number
+           }
+        } else {
+           rollNumber = await generateRollNumber(data.studentClass, data.section || 'A', admDate);
+        }
+
+        const password = generatePassword(data.fatherName || 'Parent', data.motherName);
+
+        const user = new User({
+          username: rollNumber,
+          password,
+          role: 'student',
+          name: data.name,
+          phone: data.phone
+        });
+        await user.save();
+
+        const student = new Student({
+          userId: user._id,
+          rollNumber,
+          name: data.name,
+          fatherName: data.fatherName,
+          motherName: data.motherName,
+          phone: data.phone,
+          studentClass: data.studentClass,
+          section: data.section || 'A',
+          admissionDate: admDate,
+          isArchived: data.isArchived || false,
+          createdBy: req.user._id
+        });
+        await student.save();
+
+        credentials.push({
+          name: data.name,
+          username: rollNumber,
+          password
+        });
+        summary.success++;
+
+      } catch (err) {
+        summary.failed++;
+        errors.push({ row: i + 1, name: data.name || 'Unknown', error: err.message });
+      }
+    }
+
+    res.json({
+      summary,
+      credentials,
+      errors
+    });
+
+  } catch (error) {
+    console.error('Bulk import error:', error);
+    res.status(500).json({ message: 'Server error during bulk import.' });
+  }
+};
+
+/**
  * Get all students (with filters and pagination)
  * GET /api/admin/students
  */

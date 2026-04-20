@@ -20,6 +20,7 @@ router.delete('/teachers/:id', logAction('DELETE_TEACHER'), adminController.dele
 
 // Student management
 router.post('/students', logAction('ADD_STUDENT'), adminController.addStudent);
+router.post('/students/bulk-import', logAction('BULK_IMPORT_STUDENTS'), adminController.bulkImportStudents);
 router.get('/students', adminController.getStudents);
 router.get('/students/:id', adminController.getStudent);
 router.put('/students/:id', logAction('UPDATE_STUDENT'), adminController.updateStudent);

@@ -5,6 +5,7 @@ import api from '../services/api';
 import StatsCard from '../components/StatsCard';
 import { RevenueChart, StudentGrowthChart, FeeCollectionChart, ClassBreakdownChart } from '../components/Charts';
 import StudentForm from '../components/StudentForm';
+import BulkImport from '../components/BulkImport';
 import TeacherForm from '../components/TeacherForm';
 import SessionManager from '../components/SessionManager';
 import LogViewer from '../components/LogViewer';
@@ -42,7 +43,9 @@ export default function AdminDashboard() {
   const [studentClassFilter, setStudentClassFilter] = useState('');
   const [showArchived, setShowArchived] = useState(false);
   const [showStudentForm, setShowStudentForm] = useState(false);
+  const [showBulkImport, setShowBulkImport] = useState(false);
   const [editStudent, setEditStudent] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [credsModal, setCredsModal] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [studentFeeData, setStudentFeeData] = useState(null);
@@ -124,9 +127,10 @@ export default function AdminDashboard() {
     setEditStudent(null);
     loadStudents(studentPage);
   };
-  const deleteStudent = async (id) => {
-    if (!confirm('Delete this student? This cannot be undone.')) return;
-    await api.delete(`/admin/students/${id}`);
+  const deleteStudent = async () => {
+    if (!deleteConfirm) return;
+    await api.delete(`/admin/students/${deleteConfirm}`);
+    setDeleteConfirm(null);
     loadStudents(1);
   };
   const archiveStudent = async (s) => {
@@ -154,7 +158,7 @@ export default function AdminDashboard() {
     loadTeachers();
   };
   const deleteTeacher = async (id) => {
-    if (!confirm('Delete this teacher?')) return;
+    if (!window.confirm('Delete this teacher?')) return;
     await api.delete(`/admin/teachers/${id}`);
     loadTeachers();
   };
@@ -314,6 +318,7 @@ export default function AdminDashboard() {
                     <input type="checkbox" checked={showArchived} onChange={e => setShowArchived(e.target.checked)} />
                     Archived
                   </label>
+                  <button onClick={() => setShowBulkImport(true)} className="btn-secondary text-sm px-4 py-2">📥 Import</button>
                   <button onClick={() => setShowStudentForm(true)} className="btn-primary text-sm px-4 py-2">+ Add Student</button>
                 </div>
               </div>
@@ -336,7 +341,7 @@ export default function AdminDashboard() {
                           <div className="flex gap-1">
                             <button onClick={() => setEditStudent(s)} className="text-xs btn-outline px-2 py-1">Edit</button>
                             <button onClick={() => archiveStudent(s)} className="text-xs btn-outline px-2 py-1">{s.isArchived ? 'Restore' : 'Archive'}</button>
-                            <button onClick={() => deleteStudent(s._id)} className="text-xs btn-danger px-2 py-1">Del</button>
+                            <button onClick={() => setDeleteConfirm(s._id)} className="text-xs btn-danger px-2 py-1">Del</button>
                           </div>
                         </td>
                       </tr>
@@ -442,6 +447,22 @@ export default function AdminDashboard() {
       </div>
 
       {/* Modals */}
+      {deleteConfirm && (
+        <div className="modal-overlay z-50">
+          <div className="modal-box max-w-sm">
+            <div className="p-6 text-center">
+              <div className="text-5xl mb-4">⚠️</div>
+              <h3 className="text-xl font-bold text-dark-grey mb-2">Delete Student?</h3>
+              <p className="text-mid-grey text-sm mb-6">This action cannot be undone. All related data including user account and sessions will be removed permanently.</p>
+              <div className="flex gap-3">
+                <button onClick={() => setDeleteConfirm(null)} className="btn-outline flex-1">Cancel</button>
+                <button onClick={deleteStudent} className="btn-danger flex-1">Yes, Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {showBulkImport && <BulkImport onClose={() => setShowBulkImport(false)} onSuccess={() => loadStudents(1)} />}
       {showStudentForm && <StudentForm onSubmit={addStudent} onClose={() => setShowStudentForm(false)} />}
       {editStudent && <StudentForm initial={editStudent} onSubmit={updateStudent} onClose={() => setEditStudent(null)} />}
       {showTeacherForm && <TeacherForm onSubmit={addTeacher} onClose={() => setShowTeacherForm(false)} />}

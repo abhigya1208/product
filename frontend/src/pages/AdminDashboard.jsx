@@ -14,6 +14,7 @@ import AnnouncementsPanel from '../components/AnnouncementsPanel';
 import ChatInterface from '../components/ChatInterface';
 import FeeTable from '../components/FeeTable';
 import { FEE_STRUCTURE, CLASSES, MONTH_NAMES } from '../utils/constants';
+import { useSocket } from '../context/SocketContext';
 
 const NAV = [
   { id: 'dashboard', label: 'Dashboard', icon: '📊' },
@@ -21,6 +22,8 @@ const NAV = [
   { id: 'teachers',  label: 'Teachers',  icon: '👩‍🏫' },
   { id: 'payments',  label: 'Payments',  icon: '💳' },
   { id: 'announcements', label: 'Announcements', icon: '📢' },
+  { id: 'feedback',  label: 'Feedback',  icon: '⭐' },
+  { id: 'enquiries', label: 'Enquiries', icon: '📩' },
   { id: 'sessions',  label: 'Sessions',  icon: '🔐' },
   { id: 'logs',      label: 'Logs',      icon: '📋' },
   { id: 'chat',      label: 'Chat',      icon: '💬' },
@@ -28,6 +31,7 @@ const NAV = [
 
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
+  const { socket } = useSocket();
   const navigate = useNavigate();
   const [tab, setTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -70,6 +74,13 @@ export default function AdminDashboard() {
   const [discountModal, setDiscountModal] = useState(null);
   const [discountForm, setDiscountForm] = useState({ discount: 0, discountStartMonth: '' });
 
+  // Enquiries
+  const [enquiries, setEnquiries] = useState([]);
+  const [unreadEnquiries, setUnreadEnquiries] = useState(0);
+
+  // Feedback
+  const [feedbacks, setFeedbacks] = useState([]);
+
   const loadStats = async () => {
     const res = await api.get('/admin/dashboard');
     setStats(res.data);
@@ -94,12 +105,49 @@ export default function AdminDashboard() {
     setPaymentPage(p);
   };
 
+  const loadEnquiries = async () => {
+    try {
+      const res = await api.get('/contact');
+      setEnquiries(res.data.contacts);
+      setUnreadEnquiries(res.data.contacts.filter(e => e.status === 'Unread').length);
+    } catch(err) {
+      console.error(err);
+    }
+  };
+
+  const loadFeedbacks = async () => {
+    try {
+      const res = await api.get('/feedback/admin');
+      setFeedbacks(res.data.feedbacks);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     if (tab === 'dashboard') loadStats();
     if (tab === 'students') loadStudents(1);
     if (tab === 'teachers') loadTeachers();
     if (tab === 'payments') loadPayments(1);
+    if (tab === 'enquiries') loadEnquiries();
+    if (tab === 'feedback') loadFeedbacks();
   }, [tab]);
+
+  // Initial load for enquiries badge
+  useEffect(() => {
+    loadEnquiries();
+    
+    if (socket) {
+      const handleNewEnquiry = (newEnquiry) => {
+        setUnreadEnquiries(prev => prev + 1);
+        if (tab === 'enquiries') {
+          setEnquiries(prev => [newEnquiry, ...prev]);
+        }
+      };
+      socket.on('new_enquiry', handleNewEnquiry);
+      return () => socket.off('new_enquiry', handleNewEnquiry);
+    }
+  }, [socket, tab]);
 
   useEffect(() => {
     if (tab === 'students') {
@@ -179,6 +227,40 @@ export default function AdminDashboard() {
     loadStudents(studentPage);
   };
 
+  // ── Enquiry actions ──
+  const updateEnquiryStatus = async (id, status) => {
+    try {
+      await api.patch(`/contact/${id}/status`, { status });
+      setEnquiries(prev => prev.map(e => e._id === id ? { ...e, status } : e));
+      if (status === 'Read' || status === 'Resolved') {
+        const wasUnread = enquiries.find(e => e._id === id)?.status === 'Unread';
+        if (wasUnread) setUnreadEnquiries(Math.max(0, unreadEnquiries - 1));
+      }
+    } catch(err) {
+      console.error(err);
+    }
+  };
+
+  // ── Feedback actions ──
+  const toggleFeedbackApproval = async (id, currentStatus) => {
+    try {
+      await api.patch(`/feedback/admin/${id}/approve`, { isApproved: !currentStatus });
+      loadFeedbacks();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const deleteFeedback = async (id) => {
+    if (!window.confirm('Delete this feedback permanently?')) return;
+    try {
+      await api.delete(`/feedback/admin/${id}`);
+      loadFeedbacks();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleLogout = async () => {
     await logout();
     navigate('/login');
@@ -206,9 +288,14 @@ export default function AdminDashboard() {
           <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
             {NAV.map(n => (
               <button key={n.id} onClick={() => switchTab(n.id)}
-                className={`sidebar-link w-full ${tab === n.id ? 'active' : ''}`}>
+                className={`sidebar-link w-full relative ${tab === n.id ? 'active' : ''}`}>
                 <span className="text-lg">{n.icon}</span>
                 <span className="text-sm">{n.label}</span>
+                {n.id === 'enquiries' && unreadEnquiries > 0 && (
+                  <span className="absolute right-4 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    {unreadEnquiries}
+                  </span>
+                )}
               </button>
             ))}
           </nav>
@@ -439,7 +526,103 @@ export default function AdminDashboard() {
             </div>
           )}
 
+          {/* ── ENQUIRIES TAB ── */}
+          {tab === 'enquiries' && (
+            <div className="animate-fade-in">
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="section-title text-xl">Enquiries ({enquiries.length})</h3>
+              </div>
+              <div className="overflow-x-auto rounded-xl border border-gray-100">
+                <table className="w-full min-w-[800px]">
+                  <thead>
+                    <tr>{['Status', 'Date', 'Name', 'Contact', 'Message', 'Actions'].map(h=><th key={h} className="table-th">{h}</th>)}</tr>
+                  </thead>
+                  <tbody>
+                    {enquiries.map(e => (
+                      <tr key={e._id} className={e.status === 'Unread' ? 'bg-blue-50/30 font-semibold' : 'hover:bg-gray-50'}>
+                        <td className="table-td">
+                          {e.status === 'Unread' && <span className="badge-red">Unread</span>}
+                          {e.status === 'Read' && <span className="badge-blue">Read</span>}
+                          {e.status === 'Resolved' && <span className="badge-green">Resolved</span>}
+                        </td>
+                        <td className="table-td text-xs text-mid-grey">
+                          {new Date(e.createdAt).toLocaleString('en-IN', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})}
+                        </td>
+                        <td className="table-td">{e.name}</td>
+                        <td className="table-td text-xs">
+                          {e.email}<br/>
+                          <span className="text-mid-grey">{e.phone || 'No phone'}</span>
+                        </td>
+                        <td className="table-td text-sm min-w-[250px] whitespace-normal">
+                          {e.message}
+                        </td>
+                        <td className="table-td">
+                          <select 
+                            className="input text-xs py-1" 
+                            value={e.status || 'Unread'} 
+                            onChange={(ev) => updateEnquiryStatus(e._id, ev.target.value)}
+                          >
+                            <option value="Unread">Unread</option>
+                            <option value="Read">Mark Read</option>
+                            <option value="Resolved">Resolve</option>
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                    {enquiries.length === 0 && <tr><td colSpan={6} className="table-td text-center py-8">No enquiries found.</td></tr>}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
           {tab === 'announcements' && <AnnouncementsPanel canCreate={true} />}
+
+          {/* ── FEEDBACK TAB ── */}
+          {tab === 'feedback' && (
+            <div className="animate-fade-in">
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="section-title text-xl">Feedback Overview ({feedbacks.length})</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {feedbacks.map(f => (
+                  <div key={f._id} className="card flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-semibold text-dark-grey">{f.name || 'Anonymous'}</span>
+                        <div className="flex text-yellow-500">
+                          {Array.from({length: 5}).map((_, i) => (
+                            <span key={i} className={i < f.rating ? 'opacity-100' : 'opacity-30'}>★</span>
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-mid-grey text-sm mb-4 line-clamp-4">{f.message}</p>
+                    </div>
+                    <div className="flex items-center gap-2 pt-4 border-t border-gray-100">
+                      <button 
+                        onClick={() => toggleFeedbackApproval(f._id, f.isApproved)} 
+                        className={`text-xs px-3 py-1.5 rounded-full flex-1 ${f.isApproved ? 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100' : 'bg-green-50 text-green-600 border border-green-200 hover:bg-green-100'}`}
+                      >
+                        {f.isApproved ? 'Revoke Approval' : 'Approve Publicly'}
+                      </button>
+                      <button 
+                        onClick={() => deleteFeedback(f._id)}
+                        className="text-xs px-3 py-1.5 rounded-full text-gray-500 border border-gray-200 hover:bg-gray-100"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {feedbacks.length === 0 && (
+                  <div className="col-span-full text-center py-10 text-mid-grey border border-dashed border-gray-200 rounded-xl">
+                    No feedback received yet.
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {tab === 'sessions' && <SessionManager />}
           {tab === 'logs' && <LogViewer />}
           {tab === 'chat' && <ChatInterface />}

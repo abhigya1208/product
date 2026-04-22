@@ -9,5 +9,6 @@ router.post('/', contactController.submitContact);
 
 // Admin only: view submissions
 router.get('/', auth, roleCheck('admin'), contactController.getContacts);
+router.patch('/:id/status', auth, roleCheck('admin'), contactController.updateContactStatus);
 
 module.exports = router;

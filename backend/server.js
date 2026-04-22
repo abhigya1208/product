@@ -17,6 +17,7 @@ const chatRoutes = require('./routes/chatRoutes');
 const announcementRoutes = require('./routes/announcementRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const logRoutes = require('./routes/logRoutes');
+const feedbackRoutes = require('./routes/feedbackRoutes');
 
 const app = express();
 const server = http.createServer(app);
@@ -32,6 +33,9 @@ const io = new Server(server, {
 
 // Connect to MongoDB
 connectDB();
+
+// Expose io to req.app
+app.set('io', io);
 
 // Middleware
 app.use(cors({
@@ -52,6 +56,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/announcements', announcementRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/logs', logRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -5,19 +5,10 @@ import Footer from '../components/Footer';
 
 export default function ContactUsPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pt-16">
       <Navbar />
-      <div className="pt-24 pb-10 px-4 max-w-7xl mx-auto text-center">
-        <h1 className="text-4xl font-extrabold text-dark-grey mb-4">Contact Us</h1>
-        <p className="text-mid-grey max-w-xl mx-auto">
-          Have questions? Reach out to us or visit our branch in Sonia Vihar.
-        </p>
-      </div>
-      
-      <div className="grid lg:grid-cols-2 gap-0">
-        <ContactForm />
-        <LocateUs />
-      </div>
+      <ContactForm />
+      <LocateUs />
 
       <div className="bg-cream py-16 px-4">
         <div className="max-w-7xl mx-auto grid sm:grid-cols-3 gap-8 text-center">

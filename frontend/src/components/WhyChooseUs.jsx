@@ -12,7 +12,7 @@ const features = [
   {
     icon: '📚',
     title: 'Comprehensive Curriculum',
-    desc: 'We follow CBSE‑aligned curriculum from Nursery to Class 10 with regular revision and practice tests.'
+    desc: 'We follow CBSE‑aligned curriculum from Nursery to Class 12 with regular revision and practice tests.'
   },
   {
     icon: '💡',
@@ -38,7 +38,7 @@ export default function WhyChooseUs() {
         <div className="text-center mb-14">
           <span className="inline-block bg-pastel-peach/50 text-dark-grey text-sm font-semibold px-4 py-1.5 rounded-full mb-3">Why AGS Tutorial?</span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-dark-grey">What Makes Us Different</h2>
-          <p className="mt-3 text-mid-grey max-w-xl mx-auto">Committed to providing quality education and shaping bright futures since 2015.</p>
+          <p className="mt-3 text-mid-grey max-w-xl mx-auto">Committed to providing quality education and shaping bright futures since 2022.</p>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((f, i) => (

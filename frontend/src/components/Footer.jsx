@@ -20,7 +20,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
-              Quality coaching for Nursery to Class 10 in Sonia Vihar, Delhi. Trusted by 500+ families since 2015.
+              Quality coaching for Nursery to Class 12 in Sonia Vihar, Delhi. Trusted by 500+ families since 2022.
             </p>
           </div>
 

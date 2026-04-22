@@ -7,10 +7,12 @@ export const FEE_STRUCTURE = {
   '8': 450,
   '9': 500,
   '10': 600,
+  '11': 0, // Handled as contact for details
+  '12': 0, // Handled as contact for details
 };
 
 // All available classes
-export const CLASSES = ['NUR', 'LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+export const CLASSES = ['NUR', 'LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
 
 // Classes that can have Section B
 export const SECTION_B_CLASSES = ['4', '5', '6', '7', '8'];
@@ -22,6 +24,7 @@ export const TEACHER_ASSIGNMENTS = {
   '4': 'SHIVANI MAM',  '5': 'SHIVANI MAM',
   '6': 'VARTIKA MAM',  '7': 'VARTIKA MAM',  '8': 'VARTIKA MAM',
   '9': 'ABHIGYA SIR',  '10': 'ABHIGYA SIR',
+  '11': 'CONTACT BRANCH', '12': 'CONTACT BRANCH',
 };
 
 export const MONTH_NAMES = [

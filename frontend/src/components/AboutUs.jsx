@@ -8,7 +8,10 @@ export default function AboutUs() {
             <span className="inline-block bg-pastel-green/50 text-dark-grey text-sm font-semibold px-4 py-1.5 rounded-full mb-4">Our Story</span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-dark-grey mb-5">About AGS Tutorial</h2>
             <p className="text-mid-grey leading-relaxed mb-4">
-              AGS Tutorial was founded with a single dream — to give every child in the neighbourhood access to quality education at an affordable fee. Located in Sonia Vihar, Delhi, we have been guiding students from Nursery to Class 10 since 2015.
+              AGS Tutorial was founded with a single dream — to give every child in the neighbourhood access to quality education at an affordable fee. Located in Sonia Vihar, Delhi, we have been guiding students from Nursery to Class 12 since 2022.
+            </p>
+            <p className="text-mid-grey leading-relaxed mb-4 font-semibold text-green-600">
+              ✓ 100% passing result for board students since opening (2022).
             </p>
             <p className="text-mid-grey leading-relaxed mb-6">
               Our small batch model ensures that no student is left behind. Our teachers don't just teach subjects — they build relationships, mentor students, and celebrate every milestone. Hundreds of families have trusted us with their children's futures, and we take that responsibility seriously every single day.
@@ -19,7 +22,7 @@ export default function AboutUs() {
                 <p className="text-sm text-mid-grey mt-1">Students Taught</p>
               </div>
               <div className="flex-1 bg-white rounded-2xl p-5 shadow-soft border border-gray-100 text-center">
-                <p className="text-2xl font-extrabold text-dark-grey">10+</p>
+                <p className="text-2xl font-extrabold text-dark-grey">4+</p>
                 <p className="text-sm text-mid-grey mt-1">Years Experience</p>
               </div>
               <div className="flex-1 bg-white rounded-2xl p-5 shadow-soft border border-gray-100 text-center">

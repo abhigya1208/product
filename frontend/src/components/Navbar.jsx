@@ -23,12 +23,6 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const scrollTo = (id) => {
-    setMenuOpen(false);
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  };
-
   const goLogin = (role) => {
     setLoginDropOpen(false);
     setMenuOpen(false);
@@ -47,9 +41,11 @@ export default function Navbar() {
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-6">
-            <button onClick={() => scrollTo('home')} className="text-dark-grey hover:text-pastel-green-dark font-medium transition-colors">Home</button>
-            <button onClick={() => scrollTo('about')} className="text-dark-grey hover:text-pastel-green-dark font-medium transition-colors">About</button>
-            <button onClick={() => scrollTo('contact')} className="text-dark-grey hover:text-pastel-green-dark font-medium transition-colors">Contact</button>
+            <Link to="/" className="text-dark-grey hover:text-pastel-green-dark font-medium transition-colors">Home</Link>
+            <Link to="/about" className="text-dark-grey hover:text-pastel-green-dark font-medium transition-colors">About Us</Link>
+            <Link to="/admissions" className="text-dark-grey hover:text-pastel-green-dark font-medium transition-colors">Admissions</Link>
+            <Link to="/academics" className="text-dark-grey hover:text-pastel-green-dark font-medium transition-colors">Academics</Link>
+            <Link to="/contact" className="text-dark-grey hover:text-pastel-green-dark font-medium transition-colors">Contact Us</Link>
 
             {/* Login Dropdown */}
             <div className="relative" ref={dropRef}>
@@ -89,11 +85,17 @@ export default function Navbar() {
         {/* Mobile Menu */}
         {menuOpen && (
           <div className="md:hidden bg-white rounded-2xl shadow-card mb-2 p-4 animate-slide-up border border-gray-100">
-            {['home','about','contact'].map(id => (
-              <button key={id} onClick={() => scrollTo(id)}
-                className="block w-full text-left px-4 py-3 rounded-xl hover:bg-pastel-green/20 font-medium text-dark-grey capitalize">
-                {id}
-              </button>
+            {[
+              { path: '/', label: 'Home' },
+              { path: '/about', label: 'About Us' },
+              { path: '/admissions', label: 'Admissions' },
+              { path: '/academics', label: 'Academics' },
+              { path: '/contact', label: 'Contact Us' }
+            ].map(link => (
+              <Link key={link.path} to={link.path} onClick={() => setMenuOpen(false)}
+                className="block w-full text-left px-4 py-3 rounded-xl hover:bg-pastel-green/20 font-medium text-dark-grey">
+                {link.label}
+              </Link>
             ))}
             <div className="mt-2 border-t border-gray-100 pt-2">
               {[['student','👨‍🎓 Student Login'],['teacher','👩‍🏫 Teacher Login'],['admin','🔐 Admin Login']].map(([role, label]) => (

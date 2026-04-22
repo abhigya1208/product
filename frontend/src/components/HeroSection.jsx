@@ -32,7 +32,7 @@ export default function HeroSection() {
 
   const stats = [
     { value: 500, suffix: '+', label: 'Students Enrolled' },
-    { value: 10,  suffix: '+', label: 'Years of Excellence' },
+    { value: 4,   suffix: '+', label: 'Years of Excellence' },
     { value: 5,   suffix: '',  label: 'Expert Teachers' },
     { value: 98,  suffix: '%', label: 'Success Rate' },
   ];
@@ -50,7 +50,7 @@ export default function HeroSection() {
           <div className="animate-fade-in">
             <div className="inline-flex items-center gap-2 bg-pastel-green/40 rounded-full px-4 py-1.5 mb-6">
               <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-              <span className="text-sm font-medium text-dark-grey">Admissions Open 2025–26</span>
+              <span className="text-sm font-medium text-dark-grey">Admissions Open 2026–27</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-dark-grey leading-tight mb-6">
               Carving Future –<br />
@@ -60,7 +60,8 @@ export default function HeroSection() {
               at a Time
             </h1>
             <p className="text-lg text-mid-grey mb-8 max-w-md">
-              AGS Tutorial provides quality education from Nursery to Class 10 in a nurturing, caring environment with experienced faculty and small batch sizes.
+              AGS Tutorial provides quality education from Nursery to Class 12 in a nurturing, caring environment. 
+              <span className="block mt-2 font-semibold text-green-600">100% passing result for board students since opening (2022)</span>
             </p>
             <div className="flex flex-wrap gap-4">
               <button id="hero-enroll-btn" onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
@@ -81,7 +82,7 @@ export default function HeroSection() {
                 <img src="/logo.png" alt="AGS Tutorial" className="w-44 h-44 object-contain" />
               </div>
               <div className="absolute -bottom-4 -right-4 bg-pastel-peach rounded-2xl px-4 py-2 shadow-card">
-                <p className="text-xs font-semibold text-dark-grey">Est. 2015</p>
+                <p className="text-xs font-semibold text-dark-grey">Est. 2022</p>
               </div>
               <div className="absolute -top-4 -left-4 bg-white rounded-2xl px-4 py-2 shadow-card">
                 <p className="text-xs font-semibold text-green-600">✓ Trusted by 500+ Families</p>

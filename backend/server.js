@@ -18,6 +18,7 @@ const announcementRoutes = require('./routes/announcementRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const logRoutes = require('./routes/logRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 
 const app = express();
 const server = http.createServer(app);
@@ -57,6 +58,7 @@ app.use('/api/announcements', announcementRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/logs', logRoutes);
 app.use('/api/feedback', feedbackRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

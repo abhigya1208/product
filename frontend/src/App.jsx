@@ -10,6 +10,7 @@ import AboutUsPage from './pages/AboutUsPage';
 import ContactUsPage from './pages/ContactUsPage';
 import AdmissionsPage from './pages/AdmissionsPage';
 import AcademicsPage from './pages/AcademicsPage';
+import FloatingChat from './components/FloatingChat';
 
 function ProtectedRoute({ children, roles }) {
   const { user, loading } = useAuth();
@@ -47,6 +48,7 @@ export default function App() {
         } />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <FloatingChat />
     </BrowserRouter>
   );
 }

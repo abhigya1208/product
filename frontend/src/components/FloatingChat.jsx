@@ -71,7 +71,7 @@ export default function FloatingChat() {
         {isOpen ? (
           <span className="text-white text-2xl">×</span>
         ) : (
-          <span className="text-white text-2xl">🤖</span>
+          <img src="/bot-avatar.png" alt="Bot" className="w-8 h-8 object-contain drop-shadow-md" />
         )}
       </button>
 
@@ -81,7 +81,7 @@ export default function FloatingChat() {
           {/* Header */}
           <div className="bg-[#4CAF50] p-4 text-white">
             <h3 className="font-bold text-lg flex items-center gap-2">
-              <span>🤖</span> AGS Assistant
+              <img src="/bot-avatar.png" alt="Bot" className="w-6 h-6 object-contain bg-white rounded-full p-0.5" /> AGS Assistant
             </h3>
             <p className="text-xs opacity-90">Powered by Gemini AI</p>
           </div>

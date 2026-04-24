@@ -3,8 +3,6 @@ import Navbar from '../components/Navbar';
  import WhyChooseUs from '../components/WhyChooseUs';
  import AboutUs from '../components/AboutUs';
  import FeedbackSection from '../components/FeedbackSection';
- import ContactForm from '../components/ContactForm';
- import LocateUs from '../components/LocateUs';
  import Footer from '../components/Footer';
  import { FEE_STRUCTURE } from '../utils/constants';
  import { Link } from 'react-router-dom';
@@ -25,15 +23,16 @@ import Navbar from '../components/Navbar';
            </p>
            
            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-10">
-             {Object.entries(FEE_STRUCTURE).filter(([cls]) => ['NUR', '1', '5', '9', '10'].includes(cls)).map(([cls, fee]) => (
-               <div key={cls} className="p-6 rounded-2xl bg-cream border border-gray-100 shadow-soft">
+             {['NUR', '1', '5', '9', '10'].map((cls) => (
+               <div key={cls} className="p-6 rounded-2xl bg-cream border border-gray-100 shadow-soft flex flex-col justify-center">
                  <p className="text-xs font-bold text-mid-grey uppercase mb-1">Class {cls}</p>
-                 <p className="text-2xl font-extrabold text-dark-grey">₹{fee}</p>
+                 <p className="text-2xl font-extrabold text-dark-grey">₹{FEE_STRUCTURE[cls]}</p>
                </div>
              ))}
-             <div className="p-6 rounded-2xl bg-pastel-peach/20 border border-pastel-peach/30 shadow-soft col-span-2 md:col-span-1 lg:col-span-1">
+             <div className="p-6 rounded-2xl bg-pastel-peach/20 border border-pastel-peach/30 shadow-soft col-span-2 md:col-span-1 lg:col-span-1 flex flex-col justify-center">
                <p className="text-xs font-bold text-mid-grey uppercase mb-1">Class 11 & 12</p>
-               <p className="text-sm font-bold text-dark-grey">Contact Branch</p>
+               <p className="text-2xl font-extrabold text-dark-grey">₹400 – ₹1200</p>
+               <p className="text-[10px] font-bold text-mid-grey uppercase mt-1">Contact to branch</p>
              </div>
            </div>
            
@@ -49,8 +48,6 @@ import Navbar from '../components/Navbar';
        <WhyChooseUs />
        <AboutUs />
        <FeedbackSection />
-       <ContactForm />
-       <LocateUs />
        <Footer />
      </div>
    );

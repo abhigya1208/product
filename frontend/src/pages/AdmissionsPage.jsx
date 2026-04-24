@@ -1,6 +1,6 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { FEE_STRUCTURE } from '../utils/constants';
+import { FEE_STRUCTURE, CLASSES } from '../utils/constants';
 
 export default function AdmissionsPage() {
   return (
@@ -23,22 +23,22 @@ export default function AdmissionsPage() {
               <span>💳</span> Monthly Fee Structure
             </h2>
             <div className="space-y-3">
-              {Object.entries(FEE_STRUCTURE).map(([cls, fee]) => (
-                <div key={cls} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
-                  <span className="font-medium text-dark-grey">Class {cls === 'NUR' || cls === 'LKG' || cls === 'UKG' ? cls : cls}</span>
-                  {fee > 0 ? (
-                    <span className="font-bold text-green-600">₹{fee} <span className="text-xs font-normal text-mid-grey">/ month</span></span>
-                  ) : (
-                    <span className="text-xs italic text-mid-grey">Contact branch for details</span>
-                  )}
-                </div>
-              ))}
-            </div>
-            <div className="mt-8 p-4 bg-pastel-peach/20 rounded-xl border border-pastel-peach/30">
-              <p className="text-sm font-semibold text-dark-grey mb-1">Note for Class 11 & 12:</p>
-              <p className="text-sm text-mid-grey italic">
-                Contact branch for fee details – estimated range: ₹400 to ₹1200 per month
-              </p>
+              {CLASSES.map((cls) => {
+                const fee = FEE_STRUCTURE[cls];
+                return (
+                  <div key={cls} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
+                    <span className="font-medium text-dark-grey">Class {cls}</span>
+                    {fee > 0 ? (
+                      <span className="font-bold text-green-600">₹{fee} <span className="text-xs font-normal text-mid-grey">/ month</span></span>
+                    ) : (
+                      <div className="flex items-center gap-2 text-right">
+                        <span className="font-bold text-green-600">₹400 – ₹1200</span>
+                        <span className="text-[10px] uppercase font-bold text-mid-grey mt-0.5">(Contact to branch)</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 

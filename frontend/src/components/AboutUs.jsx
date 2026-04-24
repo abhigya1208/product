@@ -26,7 +26,7 @@ export default function AboutUs() {
                 <p className="text-sm text-mid-grey mt-1">Years Experience</p>
               </div>
               <div className="flex-1 bg-white rounded-2xl p-5 shadow-soft border border-gray-100 text-center">
-                <p className="text-2xl font-extrabold text-dark-grey">98%</p>
+                <p className="text-2xl font-extrabold text-dark-grey">100%</p>
                 <p className="text-sm text-mid-grey mt-1">Success Rate</p>
               </div>
             </div>

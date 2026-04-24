@@ -34,7 +34,7 @@ export default function HeroSection() {
     { value: 500, suffix: '+', label: 'Students Enrolled' },
     { value: 4,   suffix: '+', label: 'Years of Excellence' },
     { value: 5,   suffix: '',  label: 'Expert Teachers' },
-    { value: 98,  suffix: '%', label: 'Success Rate' },
+    { value: 100, suffix: '%', label: 'Success Rate' },
   ];
 
   return (
@@ -62,6 +62,7 @@ export default function HeroSection() {
             <p className="text-lg text-mid-grey mb-8 max-w-md">
               AGS Tutorial provides quality education from Nursery to Class 12 in a nurturing, caring environment. 
               <span className="block mt-2 font-semibold text-green-600">100% passing result for board students since opening (2022)</span>
+              <span className="block mt-1 text-sm italic text-mid-grey">Every student has passed since the tuition opened in 2022.</span>
             </p>
             <div className="flex flex-wrap gap-4">
               <button id="hero-enroll-btn" onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
@@ -86,6 +87,10 @@ export default function HeroSection() {
               </div>
               <div className="absolute -top-4 -left-4 bg-white rounded-2xl px-4 py-2 shadow-card">
                 <p className="text-xs font-semibold text-green-600">✓ Trusted by 500+ Families</p>
+              </div>
+              <div className="absolute top-1/2 -translate-y-1/2 -right-16 bg-white rounded-2xl px-4 py-2 shadow-card flex items-center gap-2">
+                <span className="text-red-500 animate-pulse">●</span>
+                <p className="text-xs font-semibold text-dark-grey">24/7 CCTV Surveillance</p>
               </div>
             </div>
           </div>

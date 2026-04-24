@@ -62,10 +62,10 @@ export default function Footer() {
             <div className="flex gap-3 mt-5">
               {[
                 { label: 'Facebook', href: '#', icon: 'f' },
-                { label: 'Instagram', href: '#', icon: '📸' },
-                { label: 'WhatsApp', href: '#', icon: '💬' },
+                { label: 'Instagram', href: 'https://www.instagram.com/agstutorial/', icon: '📸' },
+                { label: 'WhatsApp', href: 'https://wa.me/919839910481', icon: '💬' },
               ].map((s) => (
-                <a key={s.label} href={s.href} title={s.label}
+                <a key={s.label} href={s.href} title={s.label} target="_blank" rel="noopener noreferrer"
                   className="w-9 h-9 rounded-full bg-white/10 hover:bg-pastel-green hover:text-dark-grey flex items-center justify-center text-sm transition-all duration-200">
                   {s.icon}
                 </a>

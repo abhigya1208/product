@@ -45,6 +45,21 @@ export default function ContactForm() {
                 </div>
               ))}
             </div>
+
+            {/* Social Links */}
+            <div className="mt-10 pt-8 border-t border-gray-100">
+              <p className="font-bold text-dark-grey mb-4 text-sm uppercase tracking-wide">Connect With Us</p>
+              <div className="flex flex-wrap gap-4">
+                <a href="https://wa.me/919839910481" target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-2 bg-[#25D366] text-white px-5 py-2.5 rounded-xl font-semibold hover:scale-105 transition-all shadow-sm">
+                  <span className="text-xl">💬</span> WhatsApp
+                </a>
+                <a href="https://www.instagram.com/agstutorial/" target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-2 bg-gradient-to-tr from-[#f09433] via-[#e6683c] to-[#bc1888] text-white px-5 py-2.5 rounded-xl font-semibold hover:scale-105 transition-all shadow-sm">
+                  <span className="text-xl">📸</span> Instagram
+                </a>
+              </div>
+            </div>
           </div>
 
           {/* Right form */}

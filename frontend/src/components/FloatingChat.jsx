@@ -1,11 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
 export default function FloatingChat() {
+  const { user, login } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
+  
+  const [role, setRole] = useState('student');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   
   const [messages, setMessages] = useState([
@@ -16,26 +20,17 @@ export default function FloatingChat() {
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    // Check if user authenticated in this session
-    const auth = sessionStorage.getItem('ai_chat_auth');
-    if (auth === 'true') {
-      setIsAuthenticated(true);
-    }
-  }, []);
-
-  useEffect(() => {
     // Scroll to bottom of chat
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (loginEmail === 'student@ags.com' && loginPassword === 'ags2026') {
-      setIsAuthenticated(true);
-      sessionStorage.setItem('ai_chat_auth', 'true');
-      setLoginError('');
-    } else {
-      setLoginError('Invalid credentials. Please contact the branch.');
+    setLoginError('');
+    try {
+      await login(username.trim(), password, role);
+    } catch (err) {
+      setLoginError('Invalid roll number or password. Please contact the branch if you are a student or ask admin for teacher access.');
     }
   };
 
@@ -91,24 +86,32 @@ export default function FloatingChat() {
             <p className="text-xs opacity-90">Powered by Gemini AI</p>
           </div>
 
-          {!isAuthenticated ? (
+          {!user ? (
             /* Login Screen */
             <div className="flex-1 p-6 flex flex-col justify-center bg-cream">
               <div className="text-center mb-6">
                 <span className="text-4xl mb-2 block">🔒</span>
                 <p className="text-dark-grey font-semibold text-sm">
-                  You have to login first to use the AI assistant. If you are not from AGS, please contact the branch.
+                  You have to login first to use the AI assistant. If you are not from AGS, please <Link to="/contact" className="text-[#4CAF50] underline hover:opacity-80" onClick={() => setIsOpen(false)}>contact the branch</Link>.
                 </p>
               </div>
               
               <form onSubmit={handleLogin} className="space-y-4">
+                <div className="flex gap-4 justify-center mb-2">
+                  {['student', 'teacher', 'admin'].map((r) => (
+                    <label key={r} className="flex items-center gap-1 text-xs text-dark-grey cursor-pointer capitalize">
+                      <input type="radio" name="role" checked={role === r} onChange={() => setRole(r)} className="accent-[#4CAF50]" />
+                      {r}
+                    </label>
+                  ))}
+                </div>
                 <div>
                   <input 
-                    type="email" 
-                    placeholder="Email" 
+                    type="text" 
+                    placeholder={role === 'student' ? "Roll Number" : "Username"} 
                     required 
-                    value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     className="w-full px-4 py-2 rounded-xl border border-gray-200 focus:outline-none focus:border-[#4CAF50] text-sm"
                   />
                 </div>
@@ -117,12 +120,12 @@ export default function FloatingChat() {
                     type="password" 
                     placeholder="Password" 
                     required 
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="w-full px-4 py-2 rounded-xl border border-gray-200 focus:outline-none focus:border-[#4CAF50] text-sm"
                   />
                 </div>
-                {loginError && <p className="text-red-500 text-xs text-center">{loginError}</p>}
+                {loginError && <p className="text-red-500 text-xs text-center leading-tight">{loginError}</p>}
                 <button type="submit" className="w-full bg-[#4CAF50] text-white py-2 rounded-xl font-semibold hover:opacity-90 transition-all text-sm">
                   Access AI Chat
                 </button>

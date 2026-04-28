@@ -41,12 +41,21 @@ FACULTY:
 - Class 4-5: SHIVANI MAM
 - Class 6-8: VARTIKA MAM
 - Class 9-10: ABHIGYA SIR
+
+HANDOFF INSTRUCTION:
+If someone asks something completely outside the scope of AGS Tutorial (e.g., cooking recipes, politics, personal advice), respond EXACTLY with: "I am connecting you to one of our team members for support. They will get back to you shortly."
+Do NOT use this phrase for simple greetings, course questions, fee queries, or anything related to the institute.
 `;
 
 // ─── Static Fallback Logic (Keywords) ───────────────────────────────────────
 function getStaticFallback(message) {
   const msg = message.toLowerCase();
   
+  // Greetings
+  if (msg === 'hi' || msg === 'hello' || msg === 'hey' || msg.includes('good morning') || msg.includes('good evening')) {
+    return "Hello! 👋 I'm the AGS Tutorial AI mentor. How can I help you today? You can ask me about our courses, fees, location, or faculty.";
+  }
+
   if (msg.includes('fee') || msg.includes('price') || msg.includes('charge')) {
     return "Our monthly fees range from ₹250 to ₹600 depending on the class. \n\n- Nursery-UKG: ₹250\n- Class 1-2: ₹300\n- Class 3-5: ₹350\n- Class 6-7: ₹400\n- Class 8: ₹450\n- Class 9: ₹500\n- Class 10: ₹600\n\nFor Classes 11-12, it ranges between ₹400–₹1200. Please visit the branch for specific details.";
   }
@@ -80,9 +89,7 @@ const HANDOFF_TRIGGERS = [
   'connect you to a team member',
   'talk to a person',
   'human support',
-  'speak to a representative',
-  'representative',
-  'human help'
+  'speak to a representative'
 ];
 
 function detectHandoff(text) {
@@ -178,47 +185,66 @@ const handleChat = async (req, res) => {
     // 2. Save User Message
     chat.messages.push({ role: 'user', content: message });
 
-    let responseText;
+    let responseText = null;
     let needsHuman = false;
+    let apiSuccess = false;
 
-    // 3. Try Gemini
+    // 3. Try Gemini with Retry Logic
+    const callGemini = async (msg, history, attempt = 1) => {
+      try {
+        if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY') {
+          throw new Error('MISSING_API_KEY');
+        }
+
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const model = genAI.getGenerativeModel({
+          model: 'gemini-1.5-flash',
+          generationConfig: { temperature: 0.7, maxOutputTokens: 800 },
+          systemInstruction: { parts: [{ text: INSTITUTE_KNOWLEDGE }] }
+        });
+
+        const formattedHistory = sanitizeHistoryForGemini(history);
+        const geminiChat = model.startChat({ history: formattedHistory });
+        const result = await geminiChat.sendMessage(msg);
+        return result.response.text();
+      } catch (err) {
+        if (attempt < 2) {
+          console.log(`[AI Chat] Gemini attempt ${attempt} failed, retrying...`);
+          return callGemini(msg, history, attempt + 1);
+        }
+        throw err;
+      }
+    };
+
     try {
-      if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY') {
-        throw new Error('MISSING_API_KEY');
-      }
-
-      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-      const model = genAI.getGenerativeModel({
-        model: 'gemini-1.5-flash',
-        generationConfig: { temperature: 0.7, maxOutputTokens: 800 },
-        systemInstruction: { parts: [{ text: INSTITUTE_KNOWLEDGE }] }
-      });
-
-      const pastMessages = chat.messages.slice(0, -1);
-      const formattedHistory = sanitizeHistoryForGemini(pastMessages);
-      const geminiChat = model.startChat({ history: formattedHistory });
-      const result = await geminiChat.sendMessage(message);
-      responseText = result.response.text();
-      needsHuman = detectHandoff(responseText);
-
-    } catch (err) {
-      console.error('[AI Chat] Gemini Error:', err.message);
+      console.log(`[AI Chat] Calling Gemini for: "${message}"`);
+      responseText = await callGemini(message, chat.messages.slice(0, -1));
+      apiSuccess = true;
+      console.log(`[AI Chat] Gemini responded: "${responseText.substring(0, 50)}..."`);
       
-      // Check for specific leaked key error
+      // Only detect handoff if API was successful
+      needsHuman = detectHandoff(responseText);
+      if (needsHuman) {
+        chat.status = 'needs_human';
+        console.log(`[AI Chat] 🚨 Handoff triggered by AI response.`);
+      }
+    } catch (err) {
+      console.error('[AI Chat] Gemini Final Failure:', err.message);
+      
+      // Check for specific leaked key error for server logs
       if (err.message.includes('leaked') || err.message.includes('reported as leaked')) {
-        console.error('🛑 CRITICAL: GEMINI_API_KEY is reported as leaked and has been disabled by Google.');
+        console.error('🛑 CRITICAL: GEMINI_API_KEY is reported as leaked.');
       }
 
-      // 4. Try Static Fallback
+      // 4. Try Static Fallback (Hidden from handoff logic)
       const fallback = getStaticFallback(message);
       if (fallback) {
         responseText = fallback;
-        console.log('[AI Chat] Used static fallback response.');
+        console.log('[AI Chat] Used static fallback.');
       } else {
-        // 5. Final Fallback (Handoff)
-        responseText = "I'm sorry, I'm having trouble connecting to my brain right now. I am connecting you to one of our team members for support. They will get back to you shortly.";
-        needsHuman = true;
-        chat.status = 'needs_human';
+        // 5. Final Connection Error Message (No handoff flag unless successful "I don't know")
+        responseText = "I'm having trouble connecting to my mentor brain right now. Please try again in a moment, or reach out to us directly at 9839910481.";
+        console.log('[AI Chat] API failed and no static fallback found.');
       }
     }
 
@@ -226,7 +252,12 @@ const handleChat = async (req, res) => {
     chat.messages.push({ role: 'assistant', content: responseText });
     await chat.save();
 
-    res.json({ text: responseText, chatId: chat._id, status: chat.status, needsHuman });
+    res.json({ 
+      text: responseText, 
+      chatId: chat._id, 
+      status: chat.status, 
+      needsHuman: apiSuccess ? needsHuman : false // Only show handoff badge if API worked and triggered it
+    });
 
   } catch (err) {
     console.error('[AI Chat] Critical Failure:', err);

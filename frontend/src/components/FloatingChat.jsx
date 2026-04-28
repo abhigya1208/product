@@ -152,7 +152,7 @@ export default function FloatingChat() {
       console.error('[FloatingChat] Send failed:', err.response?.data || err.message);
       setMessages(prev => [...prev, {
         role: 'model',
-        text: "⚠️ I'm experiencing some technical difficulties right now. I've notified the support team, or you can call us directly at 9839910481."
+        text: "⚠️ I'm having trouble connecting to my brain right now. Please try again in a moment, or reach out to us at 9839910481."
       }]);
     } finally {
       setIsLoading(false);

@@ -1,6 +1,13 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const AiChat = require('../models/AiChat');
 
+// ─── Validate API key on module load ────────────────────────────────────────
+if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY') {
+  console.warn('⚠️  WARNING: GEMINI_API_KEY is missing or set to placeholder in .env. AI chatbot will NOT work.');
+} else {
+  console.log('✅ GEMINI_API_KEY loaded successfully.');
+}
+
 // ─── Institute Knowledge System Prompt ──────────────────────────────────────
 const INSTITUTE_KNOWLEDGE = `
 You are the official AI mentor and assistant for AGS Tutorial — a coaching institute located at:
@@ -64,6 +71,65 @@ YOUR BEHAVIOUR RULES:
 7. Keep responses concise — no more than 3-4 paragraphs unless the user asks for detail.
 `;
 
+// ─── Handoff detection phrases ──────────────────────────────────────────────
+const HANDOFF_TRIGGERS = [
+  'connecting you to one of our team members',
+  'connect you to a team member',
+  'connect you with a team member',
+  'connect you to our team',
+  'connect you with our team',
+  'let me connect you',
+  'transfer you to',
+  'reaching out to our team',
+  'have a team member',
+  'have our team',
+  'escalate this',
+  'human support',
+  'speak to a representative',
+  'talk to a person',
+  'contact a team member',
+];
+
+function detectHandoff(text) {
+  const lower = text.toLowerCase();
+  return HANDOFF_TRIGGERS.some(phrase => lower.includes(phrase));
+}
+
+// ─── Sanitize history for Gemini (must alternate user/model) ────────────────
+function sanitizeHistoryForGemini(messages) {
+  const history = [];
+  let lastRole = null;
+
+  for (const m of messages) {
+    const role = m.role === 'user' ? 'user' : 'model';
+    // Skip consecutive messages from the same role (merge or skip)
+    if (role === lastRole) {
+      // Merge into the last message
+      if (history.length > 0) {
+        history[history.length - 1].parts[0].text += '\n' + m.content;
+      }
+      continue;
+    }
+    history.push({
+      role,
+      parts: [{ text: m.content }]
+    });
+    lastRole = role;
+  }
+
+  // Gemini requires history to start with 'user' if non-empty
+  while (history.length > 0 && history[0].role !== 'user') {
+    history.shift();
+  }
+
+  // Gemini requires history to end with 'model' (the last turn before the new user message)
+  while (history.length > 0 && history[history.length - 1].role !== 'model') {
+    history.pop();
+  }
+
+  return history;
+}
+
 // ─── Optional middleware: Identifies logged-in user or sets visitorId from header ─
 const optionalAuth = async (req, res, next) => {
   try {
@@ -101,7 +167,7 @@ const getHistory = async (req, res) => {
     if (!chat) return res.json({ messages: [], chatId: null });
     res.json({ messages: chat.messages, chatId: chat._id, status: chat.status, adminReplies: chat.adminReplies });
   } catch (err) {
-    console.error('AI getHistory error:', err);
+    console.error('AI getHistory error:', err.message);
     res.status(500).json({ message: 'Failed to fetch chat history.' });
   }
 };
@@ -115,8 +181,9 @@ const handleChat = async (req, res) => {
       return res.status(400).json({ message: 'Message is required.' });
     }
 
-    if (!process.env.GEMINI_API_KEY) {
-      return res.status(500).json({ message: 'Gemini API key is not configured on the server.' });
+    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY') {
+      console.error('GEMINI_API_KEY is not configured properly.');
+      return res.status(500).json({ message: 'AI service is not configured. Please contact the administrator.' });
     }
 
     // ── 1. Find or create chat thread ──────────────────────────────────────
@@ -127,8 +194,10 @@ const handleChat = async (req, res) => {
     if (!chat) {
       const query = req.user
         ? { userId: req.user._id, status: { $ne: 'closed' } }
-        : { visitorId, status: { $ne: 'closed' } };
-      chat = await AiChat.findOne(query).sort({ updatedAt: -1 });
+        : visitorId ? { visitorId, status: { $ne: 'closed' } } : null;
+      if (query) {
+        chat = await AiChat.findOne(query).sort({ updatedAt: -1 });
+      }
     }
     if (!chat) {
       chat = new AiChat({
@@ -148,35 +217,84 @@ const handleChat = async (req, res) => {
     // ── 2. Save user message ────────────────────────────────────────────────
     chat.messages.push({ role: 'user', content: message });
 
-    // ── 3. Build Gemini history from stored messages ────────────────────────
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
-      generationConfig: { temperature: 0.7, maxOutputTokens: 800 },
-      systemInstruction: INSTITUTE_KNOWLEDGE
-    });
+    // ── 3. Build Gemini conversation ────────────────────────────────────────
+    let responseText;
+    try {
+      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+      const model = genAI.getGenerativeModel({
+        model: 'gemini-1.5-flash',
+        generationConfig: { temperature: 0.7, maxOutputTokens: 800 },
+        systemInstruction: { parts: [{ text: INSTITUTE_KNOWLEDGE }] }
+      });
 
-    // Format history for Gemini (exclude the message we just added)
-    const pastMessages = chat.messages.slice(0, -1);
-    const formattedHistory = pastMessages.map(m => ({
-      role: m.role === 'user' ? 'user' : 'model',
-      parts: [{ text: m.content }]
-    }));
+      // Format and sanitize history (exclude the message we just added)
+      const pastMessages = chat.messages.slice(0, -1);
+      const formattedHistory = sanitizeHistoryForGemini(pastMessages);
 
-    const geminiChat = model.startChat({ history: formattedHistory });
-    const result = await geminiChat.sendMessage(message);
-    const responseText = result.response.text();
+      console.log(`[AI Chat] User: ${req.user?.name || visitorId || 'anonymous'} | History: ${formattedHistory.length} turns | Message: "${message.substring(0, 80)}..."`);
+
+      const geminiChat = model.startChat({ history: formattedHistory });
+      const result = await geminiChat.sendMessage(message);
+      responseText = result.response.text();
+
+      if (!responseText || responseText.trim() === '') {
+        console.warn('[AI Chat] Gemini returned empty response. Using fallback.');
+        responseText = "I'm sorry, I couldn't process that right now. Please try rephrasing your question, or call us at 9839910481 for immediate help.";
+      }
+
+      console.log(`[AI Chat] Response: "${responseText.substring(0, 100)}..."`);
+    } catch (geminiErr) {
+      console.error('[AI Chat] Gemini API call failed:', geminiErr.message);
+
+      // Detailed error classification
+      const errMsg = geminiErr.message || '';
+      if (errMsg.includes('API_KEY_INVALID') || errMsg.includes('401') || errMsg.includes('403')) {
+        console.error('[AI Chat] ❌ API key is invalid or unauthorized. Check your GEMINI_API_KEY.');
+        responseText = "I'm temporarily unable to respond. Our team has been notified. Please call us at 9839910481 for immediate assistance.";
+      } else if (errMsg.includes('429') || errMsg.includes('RATE_LIMIT') || errMsg.includes('quota')) {
+        console.error('[AI Chat] ❌ Rate limit / quota exceeded.');
+        responseText = "I'm receiving too many requests right now. Please wait a moment and try again, or call us at 9839910481.";
+      } else if (errMsg.includes('SAFETY') || errMsg.includes('blocked')) {
+        console.error('[AI Chat] ❌ Response blocked by safety filters.');
+        responseText = "I wasn't able to respond to that particular question. Could you please rephrase it? For specific queries, contact us at 9839910481.";
+      } else {
+        // Generic fallback - retry once
+        console.log('[AI Chat] Retrying once...');
+        try {
+          const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+          const model = genAI.getGenerativeModel({
+            model: 'gemini-1.5-flash',
+            generationConfig: { temperature: 0.5, maxOutputTokens: 500 },
+            systemInstruction: { parts: [{ text: INSTITUTE_KNOWLEDGE }] }
+          });
+          // Retry with no history (simpler request)
+          const retryResult = await model.generateContent(message);
+          responseText = retryResult.response.text();
+          console.log('[AI Chat] Retry succeeded.');
+        } catch (retryErr) {
+          console.error('[AI Chat] Retry also failed:', retryErr.message);
+          responseText = "I'm having trouble connecting right now. Please try again in a moment, or reach out to us directly at 9839910481.";
+        }
+      }
+    }
 
     // ── 4. Check for human handoff trigger ─────────────────────────────────
-    const HANDOFF_PHRASE = 'I am connecting you to one of our team members';
-    const needsHuman = responseText.toLowerCase().includes('connecting you to one of our team members');
+    const needsHuman = detectHandoff(responseText);
     if (needsHuman) {
       chat.status = 'needs_human';
+      console.log(`[AI Chat] 🚨 Handoff triggered for chat ${chat._id}`);
     }
 
     // ── 5. Save assistant response & persist ───────────────────────────────
     chat.messages.push({ role: 'assistant', content: responseText });
-    await chat.save();
+
+    try {
+      await chat.save();
+      console.log(`[AI Chat] ✅ Chat saved. ID: ${chat._id}, Messages: ${chat.messages.length}`);
+    } catch (saveErr) {
+      console.error('[AI Chat] ❌ Failed to save chat to database:', saveErr.message);
+      // Still return the AI response even if save fails
+    }
 
     res.json({
       text: responseText,
@@ -185,8 +303,11 @@ const handleChat = async (req, res) => {
       needsHuman
     });
   } catch (error) {
-    console.error('Gemini API Error:', error);
-    res.status(500).json({ message: 'Failed to communicate with AI service.', error: error.message });
+    console.error('[AI Chat] Unhandled error:', error.message, error.stack);
+    res.status(500).json({
+      message: 'Failed to communicate with AI service.',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 
@@ -201,7 +322,7 @@ const getSupportChats = async (req, res) => {
       .limit(100);
     res.json(chats);
   } catch (err) {
-    console.error('getSupportChats error:', err);
+    console.error('getSupportChats error:', err.message);
     res.status(500).json({ message: 'Failed to fetch support chats.' });
   }
 };
@@ -224,10 +345,11 @@ const adminReply = async (req, res) => {
     // Also add to messages so user sees it in history
     chat.messages.push({ role: 'assistant', content: `[Support Team]: ${message}` });
     await chat.save();
+    console.log(`[Support] Admin replied to chat ${chat._id}`);
 
     res.json({ success: true, chat });
   } catch (err) {
-    console.error('adminReply error:', err);
+    console.error('adminReply error:', err.message);
     res.status(500).json({ message: 'Failed to send reply.' });
   }
 };
@@ -245,9 +367,10 @@ const updateChatStatus = async (req, res) => {
       { new: true }
     );
     if (!chat) return res.status(404).json({ message: 'Chat not found.' });
+    console.log(`[Support] Chat ${chat._id} status changed to: ${status}`);
     res.json(chat);
   } catch (err) {
-    console.error('updateChatStatus error:', err);
+    console.error('updateChatStatus error:', err.message);
     res.status(500).json({ message: 'Failed to update status.' });
   }
 };
@@ -258,7 +381,8 @@ const getSupportCount = async (req, res) => {
     const count = await AiChat.countDocuments({ status: 'needs_human' });
     res.json({ count });
   } catch (err) {
-    res.status(500).json({ count: 0 });
+    console.error('getSupportCount error:', err.message);
+    res.json({ count: 0 });
   }
 };
 

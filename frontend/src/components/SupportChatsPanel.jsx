@@ -14,8 +14,8 @@ export default function SupportChatsPanel() {
     try {
       const res = await api.get('/ai/support-chats', { params: { status: statusFilter } });
       setChats(res.data);
-    } catch {
-      /* ignore */
+    } catch (err) {
+      console.error('[SupportChats] Failed to fetch chats:', err.response?.data || err.message);
     } finally {
       setLoading(false);
     }
@@ -87,16 +87,25 @@ export default function SupportChatsPanel() {
       <div className="lg:w-80 flex-shrink-0 flex flex-col">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-bold text-dark-grey">Support Chats</h3>
-          <select
-            value={statusFilter}
-            onChange={e => setStatusFilter(e.target.value)}
-            className="text-xs border border-gray-200 rounded-lg px-2 py-1 focus:outline-none"
-          >
-            <option value="needs_human">Needs Human</option>
-            <option value="active">Active</option>
-            <option value="closed">Closed</option>
-            <option value="all">All</option>
-          </select>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => { setLoading(true); fetchChats(); }}
+              className="text-xs bg-gray-100 hover:bg-gray-200 text-dark-grey px-2 py-1 rounded-lg transition-colors"
+              title="Refresh"
+            >
+              🔄
+            </button>
+            <select
+              value={statusFilter}
+              onChange={e => setStatusFilter(e.target.value)}
+              className="text-xs border border-gray-200 rounded-lg px-2 py-1 focus:outline-none"
+            >
+              <option value="needs_human">Needs Human</option>
+              <option value="active">Active</option>
+              <option value="closed">Closed</option>
+              <option value="all">All</option>
+            </select>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto space-y-2">

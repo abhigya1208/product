@@ -84,6 +84,12 @@ const PORT = process.env.PORT || 5001;
 server.listen(PORT, () => {
   console.log(`🚀 AGS Tutorial Backend running on port ${PORT}`);
   console.log(`🌐 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
+  // Validate Gemini API key
+  if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY') {
+    console.warn('⚠️  GEMINI_API_KEY is not set or is still a placeholder. AI chatbot will NOT function.');
+  } else {
+    console.log(`🤖 Gemini AI ready (key: ${process.env.GEMINI_API_KEY.substring(0, 8)}...)`);
+  }
 });
 
 module.exports = { app, server, io };

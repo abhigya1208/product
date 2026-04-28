@@ -29,12 +29,15 @@ export default function FloatingChat() {
   const [chatId, setChatId] = useState(null);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [historyLoaded, setHistoryLoaded] = useState(false);
   const [needsHuman, setNeedsHuman] = useState(false);
 
+  // Use a ref for history loaded flag to avoid stale closure / race conditions
+  const historyLoadedRef = useRef(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const visitorId = useRef(getVisitorId()).current;
+  // Track current user id to detect login/logout changes
+  const prevUserRef = useRef(user?.id || user?._id || null);
 
   // ── Scroll to bottom ───────────────────────────────────────────────────────
   useEffect(() => {
@@ -48,12 +51,17 @@ export default function FloatingChat() {
     }
   }, [isOpen, user]);
 
-  // ── Load persistent chat history when user is set or chat opens ────────────
+  // ── Load persistent chat history ──────────────────────────────────────────
   const loadHistory = useCallback(async () => {
-    if (historyLoaded) return;
+    // Guard: don't load twice
+    if (historyLoadedRef.current) return;
+    historyLoadedRef.current = true;
+
     try {
       const params = user ? {} : { visitorId };
+      console.log('[FloatingChat] Loading history...', user ? `user: ${user.name}` : `visitor: ${visitorId}`);
       const res = await api.get('/ai/history', { params });
+
       if (res.data.messages && res.data.messages.length > 0) {
         setMessages(res.data.messages.map(m => ({
           role: m.role === 'assistant' ? 'model' : 'user',
@@ -62,36 +70,48 @@ export default function FloatingChat() {
         })));
         setChatId(res.data.chatId);
         setNeedsHuman(res.data.status === 'needs_human');
+        console.log(`[FloatingChat] Loaded ${res.data.messages.length} messages. Chat ID: ${res.data.chatId}`);
       } else {
         // Default greeting
         setMessages([{
           role: 'model',
           text: "Hello! 👋 I'm the AGS Tutorial AI mentor. I can answer questions about our courses, fees, admissions, faculty, and more. How can I help you today?"
         }]);
+        setChatId(null);
+        console.log('[FloatingChat] No history found, showing greeting.');
       }
-    } catch (_) {
+    } catch (err) {
+      console.error('[FloatingChat] Failed to load history:', err.message);
       setMessages([{
         role: 'model',
         text: "Hello! 👋 I'm the AGS Tutorial AI mentor. How can I help you today?"
       }]);
-    } finally {
-      setHistoryLoaded(true);
     }
-  }, [user, visitorId, historyLoaded]);
+  }, [user, visitorId]); // Note: historyLoadedRef is NOT a dependency (it's a ref)
 
+  // ── Load history when chat opens ──────────────────────────────────────────
   useEffect(() => {
-    if (isOpen && user && !historyLoaded) {
-      loadHistory();
-    } else if (isOpen && !user) {
-      // Non-logged in users also get history (via visitorId)
+    if (isOpen && !historyLoadedRef.current) {
       loadHistory();
     }
-  }, [isOpen, user, historyLoaded, loadHistory]);
+  }, [isOpen, loadHistory]);
 
-  // ── Reset history state when user logs in (so it re-fetches merged history) ─
+  // ── Reset history when user changes (login/logout) ────────────────────────
   useEffect(() => {
-    setHistoryLoaded(false);
-  }, [user]);
+    const currentUserId = user?.id || user?._id || null;
+    if (currentUserId !== prevUserRef.current) {
+      prevUserRef.current = currentUserId;
+      // Reset so history is re-fetched for the new user
+      historyLoadedRef.current = false;
+      setMessages([]);
+      setChatId(null);
+      setNeedsHuman(false);
+      // If the chat is open, reload immediately
+      if (isOpen) {
+        loadHistory();
+      }
+    }
+  }, [user, isOpen, loadHistory]);
 
   // ── Login handler ──────────────────────────────────────────────────────────
   const handleLogin = async (e) => {
@@ -100,7 +120,7 @@ export default function FloatingChat() {
     setLoginLoading(true);
     try {
       await login(username.trim(), password, role);
-      // History will reload via the useEffect above
+      // History will reload via the useEffect above (user change detection)
     } catch {
       setLoginError('Invalid credentials. Please contact the branch if you need access.');
     } finally {
@@ -127,10 +147,13 @@ export default function FloatingChat() {
       setMessages(prev => [...prev, { role: 'model', text: res.data.text }]);
       if (res.data.chatId) setChatId(res.data.chatId);
       if (res.data.needsHuman) setNeedsHuman(true);
+      console.log(`[FloatingChat] Message sent. Chat ID: ${res.data.chatId}`);
     } catch (err) {
+      console.error('[FloatingChat] Send failed:', err.response?.data || err.message);
+      const errorMsg = err.response?.data?.message || "I'm having trouble connecting right now.";
       setMessages(prev => [...prev, {
         role: 'model',
-        text: `⚠️ Sorry, I'm having trouble connecting right now. Please try again or call us at 9839910481.`
+        text: `⚠️ ${errorMsg} Please try again or call us at 9839910481.`
       }]);
     } finally {
       setIsLoading(false);

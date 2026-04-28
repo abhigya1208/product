@@ -16,9 +16,9 @@ const roleCheck = require('../middleware/roleCheck');
 router.get('/history', optionalAuth, getHistory);
 router.post('/chat', optionalAuth, handleChat);
 
-// Admin-only routes
-router.get('/support-chats', auth, roleCheck('admin'), getSupportChats);
+// Admin-only routes — static paths MUST come before parameterized paths
 router.get('/support-chats/count', auth, roleCheck('admin'), getSupportCount);
+router.get('/support-chats', auth, roleCheck('admin'), getSupportChats);
 router.post('/support-chats/:id/reply', auth, roleCheck('admin'), adminReply);
 router.patch('/support-chats/:id/status', auth, roleCheck('admin'), updateChatStatus);
 

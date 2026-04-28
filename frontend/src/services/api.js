@@ -11,13 +11,18 @@ api.interceptors.request.use((config) => {
 });
 
 // Handle 401 globally — redirect to login
+// EXCEPT for /ai/ routes which use optionalAuth and should not force redirect
 api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401) {
-      localStorage.removeItem('ags_token');
-      localStorage.removeItem('ags_user');
-      window.location.href = '/login';
+      const requestUrl = err.config?.url || '';
+      // Don't redirect for AI chat routes — they use optional authentication
+      if (!requestUrl.includes('/ai/')) {
+        localStorage.removeItem('ags_token');
+        localStorage.removeItem('ags_user');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(err);
   }

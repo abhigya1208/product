@@ -12,6 +12,7 @@ import LogViewer from '../components/LogViewer';
 import ExportButton from '../components/ExportButton';
 import AnnouncementsPanel from '../components/AnnouncementsPanel';
 import ChatInterface from '../components/ChatInterface';
+import SupportChatsPanel from '../components/SupportChatsPanel';
 import FeeTable from '../components/FeeTable';
 import { FEE_STRUCTURE, CLASSES, MONTH_NAMES } from '../utils/constants';
 import { useSocket } from '../context/SocketContext';
@@ -24,9 +25,9 @@ const NAV = [
   { id: 'announcements', label: 'Announcements', icon: '📢' },
   { id: 'feedback',  label: 'Feedback',  icon: '⭐' },
   { id: 'enquiries', label: 'Enquiries', icon: '📩' },
+  { id: 'support_chat', label: 'Support Chats', icon: '💬' },
   { id: 'sessions',  label: 'Sessions',  icon: '🔐' },
   { id: 'logs',      label: 'Logs',      icon: '📋' },
-  { id: 'chat',      label: 'Chat',      icon: '💬' },
 ];
 
 export default function AdminDashboard() {
@@ -78,6 +79,9 @@ export default function AdminDashboard() {
   const [enquiries, setEnquiries] = useState([]);
   const [unreadEnquiries, setUnreadEnquiries] = useState(0);
 
+  // Support Chats
+  const [supportCount, setSupportCount] = useState(0);
+
   // Feedback
   const [feedbacks, setFeedbacks] = useState([]);
 
@@ -115,6 +119,15 @@ export default function AdminDashboard() {
     }
   };
 
+  const loadSupportCount = async () => {
+    try {
+      const res = await api.get('/ai/support-chats/count');
+      setSupportCount(res.data.count);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const loadFeedbacks = async () => {
     try {
       const res = await api.get('/feedback/admin');
@@ -131,12 +144,18 @@ export default function AdminDashboard() {
     if (tab === 'payments') loadPayments(1);
     if (tab === 'enquiries') loadEnquiries();
     if (tab === 'feedback') loadFeedbacks();
+    if (tab === 'support_chat') loadSupportCount();
   }, [tab]);
 
-  // Initial load for enquiries badge
+  // Initial load for badges
   useEffect(() => {
     loadEnquiries();
+    loadSupportCount();
+    const interval = setInterval(loadSupportCount, 30000); // Check for support flags every 30s
+    return () => clearInterval(interval);
+  }, []);
     
+  useEffect(() => {
     if (socket) {
       const handleNewEnquiry = (newEnquiry) => {
         setUnreadEnquiries(prev => prev + 1);
@@ -294,6 +313,11 @@ export default function AdminDashboard() {
                 {n.id === 'enquiries' && unreadEnquiries > 0 && (
                   <span className="absolute right-4 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
                     {unreadEnquiries}
+                  </span>
+                )}
+                {n.id === 'support_chat' && supportCount > 0 && (
+                  <span className="absolute right-4 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    {supportCount}
                   </span>
                 )}
               </button>
@@ -625,7 +649,7 @@ export default function AdminDashboard() {
 
           {tab === 'sessions' && <SessionManager />}
           {tab === 'logs' && <LogViewer />}
-          {tab === 'chat' && <ChatInterface />}
+          {tab === 'support_chat' && <SupportChatsPanel />}
         </main>
       </div>
 

@@ -5,7 +5,7 @@ const AiChat = require('../models/AiChat');
 if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY') {
   console.warn('⚠️  WARNING: GEMINI_API_KEY is missing or set to placeholder in .env. AI chatbot will NOT work.');
 } else {
-  console.log('✅ GEMINI_API_KEY loaded successfully.');
+  console.log('✅ GEMINI_API_KEY found.');
 }
 
 // ─── Institute Knowledge System Prompt ──────────────────────────────────────
@@ -17,17 +17,12 @@ CONTACT:
 - Phone / WhatsApp: 9839910481
 - Email: agstutorial050522@gmail.com
 - Instagram: @agstutorial (https://www.instagram.com/agstutorial/)
-- WhatsApp: https://wa.me/919839910481
 - Timings: Monday–Saturday, 7:00 AM – 8:00 PM
 
 ABOUT AGS TUTORIAL:
 - Established in 2022 (4+ years of excellence)
 - Offers coaching from Nursery to Class 12
 - 100% board passing result for every student since opening
-- 500+ students enrolled and trusted by 500+ families
-- Small batch sizes for personalized attention
-- CBSE-aligned curriculum
-- 24/7 CCTV surveillance for safety
 - Admission open for academic year 2026-27
 
 MONTHLY FEE STRUCTURE:
@@ -42,52 +37,52 @@ MONTHLY FEE STRUCTURE:
 
 FACULTY:
 - Nursery, LKG, UKG: KULSUM MAM
-- Class 1, 2, 3: KHUSHI MAM
-- Class 4, 5: SHIVANI MAM
-- Class 6, 7, 8: VARTIKA MAM
-- Class 9, 10: ABHIGYA SIR
-- Class 11 & 12: Contact branch for teacher details
-
-ADMISSION PROCESS:
-1. Visit the branch at Sonia Vihar, Delhi.
-2. Student undergoes a basic assessment.
-3. Fill the admission form and submit documents (Aadhaar, photo, previous mark-sheet).
-4. Batch allotment based on class and timing preference.
-
-ACADEMICS:
-- Foundation (Nursery–UKG): Play-way method, basic literacy & numeracy.
-- Primary (Class 1–5): Core fundamentals in languages, math, and EVS.
-- Middle (Class 6–8): Broad subjects including science and social studies.
-- Secondary (Class 9–10): CBSE board preparation with weekly tests.
-- Sr. Secondary (Class 11–12): Specialized streams (Science, Commerce, Arts).
-
-YOUR BEHAVIOUR RULES:
-1. Be warm, encouraging, and professional — like a knowledgeable human mentor from AGS Tutorial.
-2. Always answer in simple, clear language appropriate for students and parents.
-3. If asked about fees, schedules, or admissions, give the exact data above.
-4. If a question is completely unrelated to the institute or education, politely redirect the user.
-5. If you genuinely cannot answer something that requires human judgement or real-time info (e.g., specific student records, live schedule changes), say EXACTLY: "I am connecting you to one of our team members for support. They will get back to you shortly."
-6. NEVER make up information. If unsure, ask them to call 9839910481.
-7. Keep responses concise — no more than 3-4 paragraphs unless the user asks for detail.
+- Class 1-3: KHUSHI MAM
+- Class 4-5: SHIVANI MAM
+- Class 6-8: VARTIKA MAM
+- Class 9-10: ABHIGYA SIR
 `;
+
+// ─── Static Fallback Logic (Keywords) ───────────────────────────────────────
+function getStaticFallback(message) {
+  const msg = message.toLowerCase();
+  
+  if (msg.includes('fee') || msg.includes('price') || msg.includes('charge')) {
+    return "Our monthly fees range from ₹250 to ₹600 depending on the class. \n\n- Nursery-UKG: ₹250\n- Class 1-2: ₹300\n- Class 3-5: ₹350\n- Class 6-7: ₹400\n- Class 8: ₹450\n- Class 9: ₹500\n- Class 10: ₹600\n\nFor Classes 11-12, it ranges between ₹400–₹1200. Please visit the branch for specific details.";
+  }
+  
+  if (msg.includes('address') || msg.includes('location') || msg.includes('where')) {
+    return "AGS Tutorial is located at: A-353, Gali No 8, Part 2, Pusta 1, Sonia Vihar, Delhi – 110094. You are always welcome to visit us!";
+  }
+  
+  if (msg.includes('phone') || msg.includes('contact') || msg.includes('number') || msg.includes('call') || msg.includes('whatsapp')) {
+    return "You can call or WhatsApp us at 9839910481, or email us at agstutorial050522@gmail.com.";
+  }
+  
+  if (msg.includes('timing') || msg.includes('open') || msg.includes('when') || msg.includes('schedule')) {
+    return "We are open Monday to Saturday, from 7:00 AM to 8:00 PM.";
+  }
+  
+  if (msg.includes('teacher') || msg.includes('faculty') || msg.includes('sir') || msg.includes('mam')) {
+    return "Our expert faculty includes:\n- Nursery-UKG: Kulsum Mam\n- Class 1-3: Khushi Mam\n- Class 4-5: Shivani Mam\n- Class 6-8: Vartika Mam\n- Class 9-10: Abhigya Sir\n\nAll our teachers are dedicated to your academic success!";
+  }
+
+  if (msg.includes('admission') || msg.includes('join') || msg.includes('enroll')) {
+    return "Admissions are currently OPEN for the academic session 2026-27. Please visit our Sonia Vihar branch to fill out the admission form. Bring along Aadhaar, a photo, and your previous mark-sheet.";
+  }
+
+  return null; // No static match
+}
 
 // ─── Handoff detection phrases ──────────────────────────────────────────────
 const HANDOFF_TRIGGERS = [
   'connecting you to one of our team members',
   'connect you to a team member',
-  'connect you with a team member',
-  'connect you to our team',
-  'connect you with our team',
-  'let me connect you',
-  'transfer you to',
-  'reaching out to our team',
-  'have a team member',
-  'have our team',
-  'escalate this',
+  'talk to a person',
   'human support',
   'speak to a representative',
-  'talk to a person',
-  'contact a team member',
+  'representative',
+  'human help'
 ];
 
 function detectHandoff(text) {
@@ -102,35 +97,23 @@ function sanitizeHistoryForGemini(messages) {
 
   for (const m of messages) {
     const role = m.role === 'user' ? 'user' : 'model';
-    // Skip consecutive messages from the same role (merge or skip)
     if (role === lastRole) {
-      // Merge into the last message
       if (history.length > 0) {
         history[history.length - 1].parts[0].text += '\n' + m.content;
       }
       continue;
     }
-    history.push({
-      role,
-      parts: [{ text: m.content }]
-    });
+    history.push({ role, parts: [{ text: m.content }] });
     lastRole = role;
   }
 
-  // Gemini requires history to start with 'user' if non-empty
-  while (history.length > 0 && history[0].role !== 'user') {
-    history.shift();
-  }
-
-  // Gemini requires history to end with 'model' (the last turn before the new user message)
-  while (history.length > 0 && history[history.length - 1].role !== 'model') {
-    history.pop();
-  }
+  while (history.length > 0 && history[0].role !== 'user') history.shift();
+  while (history.length > 0 && history[history.length - 1].role !== 'model') history.pop();
 
   return history;
 }
 
-// ─── Optional middleware: Identifies logged-in user or sets visitorId from header ─
+// ─── Optional middleware ───────────────────────────────────────────────────
 const optionalAuth = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -144,13 +127,11 @@ const optionalAuth = async (req, res, next) => {
         const session = await Session.findOne({ token, isActive: true });
         if (session) {
           const user = await User.findById(decoded.userId);
-          if (user && user.isActive) {
-            req.user = user;
-          }
+          if (user && user.isActive) req.user = user;
         }
-      } catch (_) { /* token invalid or expired – treat as visitor */ }
+      } catch (_) {}
     }
-  } catch (_) { /* ignore */ }
+  } catch (_) {}
   next();
 };
 
@@ -167,37 +148,22 @@ const getHistory = async (req, res) => {
     if (!chat) return res.json({ messages: [], chatId: null });
     res.json({ messages: chat.messages, chatId: chat._id, status: chat.status, adminReplies: chat.adminReplies });
   } catch (err) {
-    console.error('AI getHistory error:', err.message);
-    res.status(500).json({ message: 'Failed to fetch chat history.' });
+    res.status(500).json({ message: 'Failed to fetch history.' });
   }
 };
 
 // ─── POST /api/ai/chat ───────────────────────────────────────────────────────
 const handleChat = async (req, res) => {
+  const { message, visitorId, chatId } = req.body;
+  if (!message?.trim()) return res.status(400).json({ message: 'Message is required.' });
+
   try {
-    const { message, visitorId, chatId } = req.body;
-
-    if (!message || !message.trim()) {
-      return res.status(400).json({ message: 'Message is required.' });
-    }
-
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY') {
-      console.error('GEMINI_API_KEY is not configured properly.');
-      return res.status(500).json({ message: 'AI service is not configured. Please contact the administrator.' });
-    }
-
-    // ── 1. Find or create chat thread ──────────────────────────────────────
+    // 1. Find/Create Chat
     let chat;
-    if (chatId) {
-      chat = await AiChat.findById(chatId);
-    }
+    if (chatId) chat = await AiChat.findById(chatId);
     if (!chat) {
-      const query = req.user
-        ? { userId: req.user._id, status: { $ne: 'closed' } }
-        : visitorId ? { visitorId, status: { $ne: 'closed' } } : null;
-      if (query) {
-        chat = await AiChat.findOne(query).sort({ updatedAt: -1 });
-      }
+      const query = req.user ? { userId: req.user._id, status: { $ne: 'closed' } } : visitorId ? { visitorId, status: { $ne: 'closed' } } : null;
+      if (query) chat = await AiChat.findOne(query).sort({ updatedAt: -1 });
     }
     if (!chat) {
       chat = new AiChat({
@@ -207,19 +173,20 @@ const handleChat = async (req, res) => {
         status: 'active'
       });
     }
+    if (req.user && !chat.userId) { chat.userId = req.user._id; chat.visitorId = null; }
 
-    // Merge visitor → user if logging in later
-    if (req.user && !chat.userId) {
-      chat.userId = req.user._id;
-      chat.visitorId = null;
-    }
-
-    // ── 2. Save user message ────────────────────────────────────────────────
+    // 2. Save User Message
     chat.messages.push({ role: 'user', content: message });
 
-    // ── 3. Build Gemini conversation ────────────────────────────────────────
     let responseText;
+    let needsHuman = false;
+
+    // 3. Try Gemini
     try {
+      if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY') {
+        throw new Error('MISSING_API_KEY');
+      }
+
       const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
       const model = genAI.getGenerativeModel({
         model: 'gemini-1.5-flash',
@@ -227,171 +194,74 @@ const handleChat = async (req, res) => {
         systemInstruction: { parts: [{ text: INSTITUTE_KNOWLEDGE }] }
       });
 
-      // Format and sanitize history (exclude the message we just added)
       const pastMessages = chat.messages.slice(0, -1);
       const formattedHistory = sanitizeHistoryForGemini(pastMessages);
-
-      console.log(`[AI Chat] User: ${req.user?.name || visitorId || 'anonymous'} | History: ${formattedHistory.length} turns | Message: "${message.substring(0, 80)}..."`);
-
       const geminiChat = model.startChat({ history: formattedHistory });
       const result = await geminiChat.sendMessage(message);
       responseText = result.response.text();
+      needsHuman = detectHandoff(responseText);
 
-      if (!responseText || responseText.trim() === '') {
-        console.warn('[AI Chat] Gemini returned empty response. Using fallback.');
-        responseText = "I'm sorry, I couldn't process that right now. Please try rephrasing your question, or call us at 9839910481 for immediate help.";
+    } catch (err) {
+      console.error('[AI Chat] Gemini Error:', err.message);
+      
+      // Check for specific leaked key error
+      if (err.message.includes('leaked') || err.message.includes('reported as leaked')) {
+        console.error('🛑 CRITICAL: GEMINI_API_KEY is reported as leaked and has been disabled by Google.');
       }
 
-      console.log(`[AI Chat] Response: "${responseText.substring(0, 100)}..."`);
-    } catch (geminiErr) {
-      console.error('[AI Chat] Gemini API call failed:', geminiErr.message);
-
-      // Detailed error classification
-      const errMsg = geminiErr.message || '';
-      if (errMsg.includes('API_KEY_INVALID') || errMsg.includes('401') || errMsg.includes('403')) {
-        console.error('[AI Chat] ❌ API key is invalid or unauthorized. Check your GEMINI_API_KEY.');
-        responseText = "I'm temporarily unable to respond. Our team has been notified. Please call us at 9839910481 for immediate assistance.";
-      } else if (errMsg.includes('429') || errMsg.includes('RATE_LIMIT') || errMsg.includes('quota')) {
-        console.error('[AI Chat] ❌ Rate limit / quota exceeded.');
-        responseText = "I'm receiving too many requests right now. Please wait a moment and try again, or call us at 9839910481.";
-      } else if (errMsg.includes('SAFETY') || errMsg.includes('blocked')) {
-        console.error('[AI Chat] ❌ Response blocked by safety filters.');
-        responseText = "I wasn't able to respond to that particular question. Could you please rephrase it? For specific queries, contact us at 9839910481.";
+      // 4. Try Static Fallback
+      const fallback = getStaticFallback(message);
+      if (fallback) {
+        responseText = fallback;
+        console.log('[AI Chat] Used static fallback response.');
       } else {
-        // Generic fallback - retry once
-        console.log('[AI Chat] Retrying once...');
-        try {
-          const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-          const model = genAI.getGenerativeModel({
-            model: 'gemini-1.5-flash',
-            generationConfig: { temperature: 0.5, maxOutputTokens: 500 },
-            systemInstruction: { parts: [{ text: INSTITUTE_KNOWLEDGE }] }
-          });
-          // Retry with no history (simpler request)
-          const retryResult = await model.generateContent(message);
-          responseText = retryResult.response.text();
-          console.log('[AI Chat] Retry succeeded.');
-        } catch (retryErr) {
-          console.error('[AI Chat] Retry also failed:', retryErr.message);
-          responseText = "I'm having trouble connecting right now. Please try again in a moment, or reach out to us directly at 9839910481.";
-        }
+        // 5. Final Fallback (Handoff)
+        responseText = "I'm sorry, I'm having trouble connecting to my brain right now. I am connecting you to one of our team members for support. They will get back to you shortly.";
+        needsHuman = true;
+        chat.status = 'needs_human';
       }
     }
 
-    // ── 4. Check for human handoff trigger ─────────────────────────────────
-    const needsHuman = detectHandoff(responseText);
-    if (needsHuman) {
-      chat.status = 'needs_human';
-      console.log(`[AI Chat] 🚨 Handoff triggered for chat ${chat._id}`);
-    }
-
-    // ── 5. Save assistant response & persist ───────────────────────────────
+    // 6. Save & Respond
     chat.messages.push({ role: 'assistant', content: responseText });
+    await chat.save();
 
-    try {
-      await chat.save();
-      console.log(`[AI Chat] ✅ Chat saved. ID: ${chat._id}, Messages: ${chat.messages.length}`);
-    } catch (saveErr) {
-      console.error('[AI Chat] ❌ Failed to save chat to database:', saveErr.message);
-      // Still return the AI response even if save fails
-    }
+    res.json({ text: responseText, chatId: chat._id, status: chat.status, needsHuman });
 
-    res.json({
-      text: responseText,
-      chatId: chat._id,
-      status: chat.status,
-      needsHuman
-    });
-  } catch (error) {
-    console.error('[AI Chat] Unhandled error:', error.message, error.stack);
-    res.status(500).json({
-      message: 'Failed to communicate with AI service.',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+  } catch (err) {
+    console.error('[AI Chat] Critical Failure:', err);
+    res.status(500).json({ message: 'Internal server error.' });
   }
 };
 
-// ─── GET /api/ai/support-chats (Admin) ──────────────────────────────────────
+// Admin handlers...
 const getSupportChats = async (req, res) => {
   try {
-    const { status = 'needs_human' } = req.query;
-    const query = status === 'all' ? {} : { status };
-    const chats = await AiChat.find(query)
-      .populate('userId', 'name username role')
-      .sort({ updatedAt: -1 })
-      .limit(100);
+    const chats = await AiChat.find({ status: req.query.status || 'needs_human' }).populate('userId', 'name').sort({ updatedAt: -1 });
     res.json(chats);
-  } catch (err) {
-    console.error('getSupportChats error:', err.message);
-    res.status(500).json({ message: 'Failed to fetch support chats.' });
-  }
+  } catch (err) { res.status(500).json({ message: 'Error' }); }
 };
-
-// ─── POST /api/ai/support-chats/:id/reply (Admin) ───────────────────────────
 const adminReply = async (req, res) => {
   try {
-    const { message } = req.body;
-    if (!message || !message.trim()) {
-      return res.status(400).json({ message: 'Reply message is required.' });
-    }
     const chat = await AiChat.findById(req.params.id);
-    if (!chat) return res.status(404).json({ message: 'Chat not found.' });
-
-    chat.adminReplies.push({
-      message,
-      adminId: req.user._id,
-      timestamp: new Date()
-    });
-    // Also add to messages so user sees it in history
-    chat.messages.push({ role: 'assistant', content: `[Support Team]: ${message}` });
+    if (!chat) return res.status(404).json({ message: 'Not found' });
+    chat.adminReplies.push({ message: req.body.message, adminId: req.user._id });
+    chat.messages.push({ role: 'assistant', content: `[Support Team]: ${req.body.message}` });
     await chat.save();
-    console.log(`[Support] Admin replied to chat ${chat._id}`);
-
-    res.json({ success: true, chat });
-  } catch (err) {
-    console.error('adminReply error:', err.message);
-    res.status(500).json({ message: 'Failed to send reply.' });
-  }
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ message: 'Error' }); }
 };
-
-// ─── PATCH /api/ai/support-chats/:id/status (Admin) ─────────────────────────
 const updateChatStatus = async (req, res) => {
   try {
-    const { status } = req.body;
-    if (!['active', 'needs_human', 'closed'].includes(status)) {
-      return res.status(400).json({ message: 'Invalid status.' });
-    }
-    const chat = await AiChat.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    );
-    if (!chat) return res.status(404).json({ message: 'Chat not found.' });
-    console.log(`[Support] Chat ${chat._id} status changed to: ${status}`);
+    const chat = await AiChat.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
     res.json(chat);
-  } catch (err) {
-    console.error('updateChatStatus error:', err.message);
-    res.status(500).json({ message: 'Failed to update status.' });
-  }
+  } catch (err) { res.status(500).json({ message: 'Error' }); }
 };
-
-// ─── GET /api/ai/support-chats/count (Admin) ────────────────────────────────
 const getSupportCount = async (req, res) => {
   try {
     const count = await AiChat.countDocuments({ status: 'needs_human' });
     res.json({ count });
-  } catch (err) {
-    console.error('getSupportCount error:', err.message);
-    res.json({ count: 0 });
-  }
+  } catch (err) { res.json({ count: 0 }); }
 };
 
-module.exports = {
-  optionalAuth,
-  getHistory,
-  handleChat,
-  getSupportChats,
-  adminReply,
-  updateChatStatus,
-  getSupportCount
-};
+module.exports = { optionalAuth, getHistory, handleChat, getSupportChats, adminReply, updateChatStatus, getSupportCount };

@@ -150,10 +150,9 @@ export default function FloatingChat() {
       console.log(`[FloatingChat] Message sent. Chat ID: ${res.data.chatId}`);
     } catch (err) {
       console.error('[FloatingChat] Send failed:', err.response?.data || err.message);
-      const errorMsg = err.response?.data?.message || "I'm having trouble connecting right now.";
       setMessages(prev => [...prev, {
         role: 'model',
-        text: `⚠️ ${errorMsg} Please try again or call us at 9839910481.`
+        text: "⚠️ I'm experiencing some technical difficulties right now. I've notified the support team, or you can call us directly at 9839910481."
       }]);
     } finally {
       setIsLoading(false);

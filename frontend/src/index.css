@@ -15,8 +15,7 @@
   }
   body {
     font-family: 'Inter', system-ui, sans-serif;
-    background-color: #FFF9F0;
-    color: #4A4A4A;
+    @apply bg-cream text-dark-grey dark:bg-slate-950 dark:text-gray-100 transition-colors duration-200;
     line-height: 1.6;
   }
 }
@@ -35,13 +34,13 @@
     @apply bg-red-100 hover:bg-red-200 text-red-700 font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 active:scale-95;
   }
   .card {
-    @apply bg-white rounded-2xl shadow-card p-6 border border-gray-100;
+    @apply bg-white dark:bg-slate-900 rounded-2xl shadow-card p-6 border border-gray-100 dark:border-slate-800 transition-all duration-200;
   }
   .input {
-    @apply w-full border border-gray-200 rounded-xl px-4 py-2.5 text-dark-grey focus:outline-none focus:ring-2 focus:ring-pastel-green focus:border-transparent transition-all duration-200 bg-white;
+    @apply w-full border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-dark-grey dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-pastel-green focus:border-transparent transition-all duration-200 bg-white dark:bg-slate-800;
   }
   .label {
-    @apply block text-sm font-medium text-dark-grey mb-1.5;
+    @apply block text-sm font-medium text-dark-grey dark:text-gray-200 mb-1.5;
   }
   .badge-green {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800;
@@ -56,28 +55,28 @@
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800;
   }
   .sidebar-link {
-    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-dark-grey hover:bg-pastel-green/30 transition-all duration-150 font-medium cursor-pointer;
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-dark-grey dark:text-gray-200 hover:bg-pastel-green/30 dark:hover:bg-slate-800 transition-all duration-150 font-medium cursor-pointer;
   }
   .sidebar-link.active {
-    @apply bg-pastel-green text-dark-grey shadow-soft;
+    @apply bg-pastel-green text-dark-grey dark:text-slate-900 shadow-soft;
   }
   .table-th {
-    @apply text-left text-xs font-semibold text-mid-grey uppercase tracking-wider px-4 py-3 bg-gray-50;
+    @apply text-left text-xs font-semibold text-mid-grey dark:text-gray-300 uppercase tracking-wider px-4 py-3 bg-gray-50 dark:bg-slate-800;
   }
   .table-td {
-    @apply px-4 py-3 text-sm text-dark-grey border-b border-gray-50;
+    @apply px-4 py-3 text-sm text-dark-grey dark:text-gray-200 border-b border-gray-50 dark:border-slate-800;
   }
   .modal-overlay {
     @apply fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in;
   }
   .modal-box {
-    @apply bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-slide-up;
+    @apply bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-slide-up border dark:border-slate-800;
   }
   .section-title {
-    @apply text-2xl font-bold text-dark-grey mb-1;
+    @apply text-2xl font-bold text-dark-grey dark:text-white mb-1;
   }
   .section-subtitle {
-    @apply text-mid-grey text-sm mb-6;
+    @apply text-mid-grey dark:text-gray-400 text-sm mb-6;
   }
 }
 

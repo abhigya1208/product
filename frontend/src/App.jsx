@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
-import PrivacyPolicy from './pages/PrivacyPolicy';
+import PrivacyInfo from './pages/PrivacyInfo';
 import AdminDashboard from './pages/AdminDashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
 import StudentDashboard from './pages/StudentDashboard';
@@ -30,7 +30,7 @@ export default function App() {
         <Route path="/admissions" element={<AdmissionsPage />} />
         <Route path="/academics" element={<AcademicsPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/privacy" element={<PrivacyInfo />} />
         <Route path="/admin/*" element={
           <ProtectedRoute roles={['admin']}>
             <AdminDashboard />

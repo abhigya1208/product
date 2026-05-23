@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-export default function PrivacyPolicy() {
+export default function PrivacyInfo() {
   return (
     <div className="min-h-screen bg-cream">
       <div className="max-w-4xl mx-auto px-4 py-12">

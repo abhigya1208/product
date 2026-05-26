@@ -28,15 +28,7 @@ const NAV = [
   { id: 'teachers',  label: 'Teachers',  icon: '👩‍🏫' },
   { id: 'salaries',  label: 'Salaries',  icon: '💰' },
   { id: 'support_chat', label: 'Support Chats', icon: '💬' },
-  { id: 'settings', label: 'Settings', icon: '⚙️', children: [
-        { id: 'logs', label: 'Logs' },
-        { id: 'sessions', label: 'Session' },
-        { id: 'feedback', label: 'Feedback' },
-        { id: 'enquiries', label: 'Inquiries' },
-        { id: 'announcements', label: 'Announcements' },
-        { id: 'payments', label: 'Payments' },
-      ]
-  },
+  { id: 'settings', label: 'Settings', icon: '⚙️' },
 ];
 
 export default function AdminDashboard() {
@@ -114,9 +106,16 @@ export default function AdminDashboard() {
   // Insert rendering in main return
   // Replace placeholder where tabs are rendered
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [openSubmenu, setOpenSubmenu] = useState(null);
-
+  const [settingsSubTab, setSettingsSubTab] = useState('logs');
+  const settingsNav = [
+    { id: 'logs', label: 'Logs' },
+    { id: 'sessions', label: 'Session' },
+    { id: 'feedback', label: 'Feedback' },
+    { id: 'enquiries', label: 'Inquiries' },
+    { id: 'announcements', label: 'Announcements' },
+    { id: 'payments', label: 'Payments' },
+    { id: 'account', label: 'Account' },
+  ];
   // Dashboard data
   const [stats, setStats] = useState(null);
 
@@ -491,6 +490,158 @@ export default function AdminDashboard() {
           )}
           {/* ── SALARIES TAB ── */}
           {tab === 'salaries' && renderSalariesTab()}
+
+          {/* ── STUDENTS TAB ── */}
+          {tab === 'settings' && (
+             <div className="flex h-full">
+               {/* Left Sub-Nav */}
+               <nav className="w-48 border-r border-gray-100">
+                 {settingsNav.map((item) => (
+                   <button
+                     key={item.id}
+                     onClick={() => setSettingsSubTab(item.id)}
+                     className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${settingsSubTab === item.id ? 'bg-gray-200 font-semibold' : ''}`}
+                   >
+                     {item.label}
+                   </button>
+                 ))}
+               </nav>
+               {/* Right Content */}
+               <div className="flex-1 p-6 overflow-auto">
+                 {settingsSubTab === 'logs' && <LogViewer />}
+                 {settingsSubTab === 'sessions' && <SessionManager />}
+                 {settingsSubTab === 'announcements' && <AnnouncementsPanel canCreate={true} />}
+                 {settingsSubTab === 'feedback' && (
+                   <>
+                     <div className="flex items-center justify-between mb-5">
+                       <h3 className="section-title text-xl">Feedback Overview ({feedbacks.length})</h3>
+                     </div>
+                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                       {feedbacks.map(f => (
+                         <div key={f._id} className="card flex flex-col justify-between">
+                           <div>
+                             <div className="flex items-center justify-between mb-2">
+                               <span className="font-semibold text-dark-grey">{f.name || 'Anonymous'}</span>
+                               <div className="flex text-yellow-500">
+                                 {Array.from({ length: 5 }).map((_, i) => (
+                                   <span key={i} className={i < f.rating ? 'opacity-100' : 'opacity-30'}>★</span>
+                                 ))}
+                               </div>
+                             </div>
+                             <p className="text-mid-grey text-sm mb-4 line-clamp-4">{f.message}</p>
+                           </div>
+                           <div className="flex items-center gap-2 pt-4 border-t border-gray-100">
+                             <button
+                               onClick={() => toggleFeedbackApproval(f._id, f.isApproved)}
+                               className={`text-xs px-3 py-1.5 rounded-full flex-1 ${f.isApproved ? 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100' : 'bg-green-50 text-green-600 border border-green-200 hover:bg-green-100'}`}
+                             >
+                               {f.isApproved ? 'Revoke Approval' : 'Approve Publicly'}
+                             </button>
+                             <button
+                               onClick={() => deleteFeedback(f._id)}
+                               className="text-xs px-3 py-1.5 rounded-full text-gray-500 border border-gray-200 hover:bg-gray-100"
+                             >
+                               Delete
+                             </button>
+                           </div>
+                         </div>
+                       ))}
+                       {feedbacks.length === 0 && (
+                         <div className="col-span-full text-center py-10 text-mid-grey border border-dashed border-gray-200 rounded-xl">
+                           No feedback received yet.
+                         </div>
+                       )}
+                     </div>
+                   </>
+                 )}
+                 {settingsSubTab === 'enquiries' && (
+                   <>
+                     <div className="flex items-center justify-between mb-5">
+                       <h3 className="section-title text-xl">Enquiries ({enquiries.length})</h3>
+                     </div>
+                     <div className="overflow-x-auto rounded-xl border border-gray-100">
+                       <table className="w-full min-w-[800px]">
+                         <thead>
+                           <tr>{['Status', 'Date', 'Name', 'Contact', 'Message', 'Actions'].map(h => <th key={h} className="table-th">{h}</th>)}</tr>
+                         </thead>
+                         <tbody>
+                           {enquiries.map(e => (
+                             <tr key={e._id} className={e.status === 'Unread' ? 'bg-blue-50/30 font-semibold' : 'hover:bg-gray-50'}>
+                               <td className="table-td">
+                                 {e.status === 'Unread' && <span className="badge-red">Unread</span>}
+                                 {e.status === 'Read' && <span className="badge-blue">Read</span>}
+                                 {e.status === 'Resolved' && <span className="badge-green">Resolved</span>}
+                               </td>
+                               <td className="table-td text-xs text-mid-grey">{new Date(e.createdAt).toLocaleString('en-IN', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})}</td>
+                               <td className="table-td">{e.name}</td>
+                               <td className="table-td text-xs"><>{e.email}<br/><span className="text-mid-grey">{e.phone || 'No phone'}</span></></td>
+                               <td className="table-td text-sm min-w-[250px] whitespace-normal">{e.message}</td>
+                               <td className="table-td">
+                                 <select className="input text-xs py-1" value={e.status || 'Unread'} onChange={(ev) => updateEnquiryStatus(e._id, ev.target.value)}>
+                                   <option value="Unread">Unread</option>
+                                   <option value="Read">Mark Read</option>
+                                   <option value="Resolved">Resolve</option>
+                                 </select>
+                               </td>
+                             </tr>
+                           ))}
+                           {enquiries.length === 0 && (
+                             <tr><td colSpan={6} className="table-td text-center py-8">No enquiries found.</td></tr>
+                           )}
+                         </tbody>
+                       </table>
+                     </div>
+                   </>
+                 )}
+                 {settingsSubTab === 'payments' && (
+                   <>
+                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+                       <h3 className="section-title text-xl">Payments ({paymentTotal})</h3>
+                       <div className="flex gap-2 flex-wrap">
+                         <input className="input max-w-[200px] text-sm" placeholder="Search student…" value={paymentSearch} onChange={e => setPaymentSearch(e.target.value)} />
+                         <select className="input max-w-[130px] text-sm" value={paymentType} onChange={e => setPaymentType(e.target.value)}>
+                           <option value="">All Types</option>
+                           <option value="online">Online</option>
+                           <option value="offline">Offline</option>
+                         </select>
+                       </div>
+                     </div>
+                     <div className="overflow-x-auto rounded-xl border border-gray-100">
+                       <table className="w-full min-w-[700px]">
+                         <thead>
+                           <tr>{['Student', 'Class', 'Month', 'Amount', 'Type', 'Date', 'Slip/TxnID'].map(h => <th key={h} className="table-th">{h}</th>)}</tr>
+                         </thead>
+                         <tbody>
+                           {payments.map(p => (
+                             <tr key={p._id} className="hover:bg-gray-50">
+                               <td className="table-td"><p className="font-medium">{p.studentId?.name}</p><p className="text-xs text-mid-grey font-mono">{p.studentId?.rollNumber}</p></td>
+                               <td className="table-td"><span className="badge-green">Cls {p.studentId?.studentClass}</span></td>
+                               <td className="table-td text-sm">{MONTH_NAMES[(p.month||1)-1].slice(0,3)} {p.year}</td>
+                               <td className="table-td font-bold">₹{p.amount}</td>
+                               <td className="table-td"><span className={p.type === 'online' ? 'badge-blue' : 'badge-yellow'}>{p.type}</span></td>
+                               <td className="table-td text-xs text-mid-grey">{new Date(p.paidAt).toLocaleDateString('en-IN')}</td>
+                               <td className="table-td text-xs font-mono text-mid-grey">{p.slipNumber || p.razorpayPaymentId?.slice(-8) || 'N/A'}</td>
+                             </tr>
+                           ))}
+                           {payments.length === 0 && (
+                             <tr><td colSpan={7} className="table-td text-center text-mid-grey py-8">No payments found.</td></tr>
+                           )}
+                         </tbody>
+                       </table>
+                     </div>
+                     <div className="flex justify-between items-center mt-4">
+                       <p className="text-sm text-mid-grey">Showing {payments.length} of {paymentTotal}</p>
+                       <div className="flex gap-2">
+                         <button onClick={() => loadPayments(paymentPage - 1)} disabled={paymentPage <= 1} className="btn-outline text-sm px-4 py-1.5 disabled:opacity-40">← Prev</button>
+                         <button onClick={() => loadPayments(paymentPage + 1)} disabled={payments.length < 20} className="btn-outline text-sm px-4 py-1.5 disabled:opacity-40">Next →</button>
+                       </div>
+                     </div>
+                   </>
+                 )}
+                 {settingsSubTab === 'account' && <SettingsPanel />}
+               </div>
+             </div>
+           )}
 
           {/* ── STUDENTS TAB ── */}
           {tab === 'students' && (

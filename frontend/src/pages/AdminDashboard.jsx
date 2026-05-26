@@ -26,15 +26,17 @@ const NAV = [
   { id: 'dashboard', label: 'Dashboard', icon: '📊' },
   { id: 'students',  label: 'Students',  icon: '👨‍🎓' },
   { id: 'teachers',  label: 'Teachers',  icon: '👩‍🏫' },
-  { id: 'payments',  label: 'Payments',  icon: '💳' },
   { id: 'salaries',  label: 'Salaries',  icon: '💰' },
-  { id: 'announcements', label: 'Announcements', icon: '📢' },
-  { id: 'feedback',  label: 'Feedback',  icon: '⭐' },
-  { id: 'enquiries', label: 'Enquiries', icon: '📩' },
   { id: 'support_chat', label: 'Support Chats', icon: '💬' },
-  { id: 'sessions',  label: 'Sessions',  icon: '🔐' },
-  { id: 'logs',      label: 'Logs',      icon: '📋' },
-  { id: 'settings',  label: 'Settings',  icon: '⚙️' },
+  { id: 'settings', label: 'Settings', icon: '⚙️', children: [
+        { id: 'logs', label: 'Logs' },
+        { id: 'sessions', label: 'Session' },
+        { id: 'feedback', label: 'Feedback' },
+        { id: 'enquiries', label: 'Inquiries' },
+        { id: 'announcements', label: 'Announcements' },
+        { id: 'payments', label: 'Payments' },
+      ]
+  },
 ];
 
 export default function AdminDashboard() {
@@ -48,7 +50,7 @@ export default function AdminDashboard() {
   const [showSalaryPayment, setShowSalaryPayment] = useState(false);
   const [showSalaryLedger, setShowSalaryLedger] = useState(false);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
-
+  const [selectedTeacherDetail, setSelectedTeacherDetail] = useState(null);
   const [tab, setTab] = useState('dashboard');
   const loadSalaries = async () => {
     setSalaryLoading(true);
@@ -113,6 +115,7 @@ export default function AdminDashboard() {
   // Replace placeholder where tabs are rendered
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [openSubmenu, setOpenSubmenu] = useState(null);
 
   // Dashboard data
   const [stats, setStats] = useState(null);
@@ -383,22 +386,45 @@ export default function AdminDashboard() {
 
           {/* Nav */}
           <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-            {NAV.map(n => (
-              <button key={n.id} onClick={() => switchTab(n.id)}
-                className={`sidebar-link w-full relative ${tab === n.id ? 'active' : ''}`}>
-                <span className="text-lg">{n.icon}</span>
-                <span className="text-sm">{n.label}</span>
-                {n.id === 'enquiries' && unreadEnquiries > 0 && (
-                  <span className="absolute right-4 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                    {unreadEnquiries}
-                  </span>
+            {NAV.map((n) => (
+              <div key={n.id}>
+                <button
+                  onClick={() => {
+                    if (n.children) {
+                      setOpenSubmenu(open => (open === n.id ? null : n.id));
+                    } else {
+                      switchTab(n.id);
+                    }
+                  }}
+                  className={`sidebar-link w-full relative ${tab === n.id ? 'active' : ''}`}
+                >
+                  <span className="text-lg">{n.icon}</span>
+                  <span className="text-sm">{n.label}</span>
+                  {n.id === 'enquiries' && unreadEnquiries > 0 && (
+                    <span className="absolute right-4 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      {unreadEnquiries}
+                    </span>
+                  )}
+                  {n.id === 'support_chat' && supportCount > 0 && (
+                    <span className="absolute right-4 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      {supportCount}
+                    </span>
+                  )}
+                </button>
+                {n.children && openSubmenu === n.id && (
+                  <div className="ml-4 mt-1 space-y-0.5">
+                    {n.children.map((child) => (
+                      <button
+                        key={child.id}
+                        onClick={() => switchTab(child.id)}
+                        className={`sidebar-link w-full relative pl-6 ${tab === child.id ? 'active' : ''}`}
+                      >
+                        <span className="text-sm">{child.label}</span>
+                      </button>
+                    ))}
+                  </div>
                 )}
-                {n.id === 'support_chat' && supportCount > 0 && (
-                  <span className="absolute right-4 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                    {supportCount}
-                  </span>
-                )}
-              </button>
+              </div>
             ))}
           </nav>
 
@@ -560,9 +586,27 @@ export default function AdminDashboard() {
                 <h3 className="section-title text-xl">Teachers ({teachers.length})</h3>
                 <button onClick={() => setShowTeacherForm(true)} className="btn-primary text-sm px-4 py-2">+ Add Teacher</button>
               </div>
+              {selectedTeacherDetail && (
+                <div className="fixed inset-0 bg-black/40 z-50 flex justify-end">
+                  <div className="w-full max-w-lg bg-white h-full overflow-y-auto shadow-xl animate-slide-up">
+                    <div className="flex items-center justify-between p-5 border-b border-gray-100 sticky top-0 bg-white z-10">
+                      <div>
+                        <h3 className="font-bold text-dark-grey">{selectedTeacherDetail.name}</h3>
+                        <p className="text-sm text-mid-grey">{selectedTeacherDetail.username}</p>
+                      </div>
+                      <button onClick={() => setSelectedTeacherDetail(null)} className="text-2xl text-mid-grey hover:text-dark-grey leading-none">×</button>
+                    </div>
+                    <div className="p-5 space-y-5">
+                      {selectedTeacherDetail.email && <p className="text-sm">✉️ {selectedTeacherDetail.email}</p>}
+                      {selectedTeacherDetail.phone && <p className="text-sm">📞 {selectedTeacherDetail.phone}</p>}
+                      {/* Additional sections like assignments, salary can be added here */}
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {teachers.map(t => (
-                  <div key={t._id} className="card hover:shadow-card transition-all">
+                  <div key={t._id} className="card hover:shadow-card transition-all cursor-pointer" onClick={() => setSelectedTeacherDetail(t)}>
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-12 h-12 rounded-2xl bg-pastel-peach/50 flex items-center justify-center text-xl font-bold text-dark-grey">{t.name[0]}</div>
                       <div>
@@ -573,8 +617,8 @@ export default function AdminDashboard() {
                     {t.phone && <p className="text-sm text-mid-grey mb-1">📞 {t.phone}</p>}
                     {t.email && <p className="text-sm text-mid-grey mb-3">✉️ {t.email}</p>}
                     <div className="flex gap-2 mt-2">
-                      <button onClick={() => setEditTeacher(t)} className="btn-outline text-xs px-3 py-1.5 flex-1">Edit</button>
-                      <button onClick={() => deleteTeacher(t._id)} className="btn-danger text-xs px-3 py-1.5 flex-1">Delete</button>
+                      <button onClick={e => { e.stopPropagation(); setEditTeacher(t); }} className="btn-outline text-xs px-3 py-1.5 flex-1">Edit</button>
+                      <button onClick={e => { e.stopPropagation(); deleteTeacher(t._id); }} className="btn-danger text-xs px-3 py-1.5 flex-1">Delete</button>
                     </div>
                   </div>
                 ))}

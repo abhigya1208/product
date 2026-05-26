@@ -21,7 +21,7 @@ import SalaryPaymentModal from '../components/SalaryPaymentModal';
 import SalaryLedgerDrawer from '../components/SalaryLedgerDrawer';
 import SalaryAssignmentModal from '../components/SalaryAssignmentModal';
 import ThemeToggler from '../components/ThemeToggler';
-
+import ErrorBoundary from '../components/ErrorBoundary';
 const NAV = [
   { id: 'dashboard', label: 'Dashboard', icon: '📊' },
   { id: 'students',  label: 'Students',  icon: '👨‍🎓' },
@@ -44,6 +44,7 @@ export default function AdminDashboard() {
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [selectedTeacherDetail, setSelectedTeacherDetail] = useState(null);
   const [tab, setTab] = useState('dashboard');
+const [sidebarOpen, setSidebarOpen] = useState(false);
   const loadSalaries = async () => {
     setSalaryLoading(true);
     try {
@@ -367,7 +368,7 @@ export default function AdminDashboard() {
 
   const switchTab = (t) => { setTab(t); setSidebarOpen(false); };
 
-  return (
+  return (<ErrorBoundary>
     <div className="flex h-screen bg-cream overflow-hidden">
       {/* Sidebar */}
       <>
@@ -1054,5 +1055,6 @@ export default function AdminDashboard() {
         </div>
       )}
     </div>
-  );
+  </ErrorBoundary>
+);
 }

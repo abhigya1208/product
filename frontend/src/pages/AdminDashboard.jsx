@@ -17,7 +17,10 @@ import FeeTable from '../components/FeeTable';
 import { FEE_STRUCTURE, CLASSES, MONTH_NAMES } from '../utils/constants';
 import { useSocket } from '../context/SocketContext';
 import SettingsPanel from '../components/SettingsPanel';
-import ThemeToggler from '../components/ThemeToggler';
+import SalaryPaymentModal from '../components/SalaryPaymentModal';
+import SalaryLedgerDrawer from '../components/SalaryLedgerDrawer';
+import SalaryAssignmentModal from '../components/SalaryAssignmentModal';
+
 
 const NAV = [
   { id: 'dashboard', label: 'Dashboard', icon: '📊' },
@@ -38,7 +41,76 @@ export default function AdminDashboard() {
   const { user, logout } = useAuth();
   const { socket } = useSocket();
   const navigate = useNavigate();
-  const [tab, setTab] = useState('dashboard');
+  // Salary Management
+  const [salaryData, setSalaryData] = useState([]);
+  const [salaryLoading, setSalaryLoading] = useState(false);
+  const [showSalaryAssignment, setShowSalaryAssignment] = useState(false);
+  const [showSalaryPayment, setShowSalaryPayment] = useState(false);
+  const [showSalaryLedger, setShowSalaryLedger] = useState(false);
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
+
+  const loadSalaries = async () => {
+    setSalaryLoading(true);
+    try {
+      const res = await api.get('/admin/salary/calculate'); // expects month/year params if needed
+      setSalaryData(res.data.salaryData);
+    } catch (err) {
+      console.error('Load salaries error:', err);
+    } finally {
+      setSalaryLoading(false);
+    }
+  };
+
+  // UI for salaries tab
+  const renderSalariesTab = () => (
+    <div className="animate-fade-in">
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="section-title text-xl">Teacher Salary Management</h3>
+        <button onClick={() => setShowSalaryAssignment(true)} className="btn-primary text-sm px-4 py-2">Assign Class</button>
+      </div>
+      {salaryLoading ? (
+        <p className="text-mid-grey">Loading salaries...</p>
+      ) : (
+        <div className="overflow-x-auto rounded-xl border border-gray-100">
+          <table className="w-full min-w-[800px]">
+            <thead>
+              <tr>{['Teacher', 'Class Assignments', 'Calculated Salary', 'Paid', 'Status', 'Actions'].map(h => <th key={h} className="table-th">{h}</th>)}</tr>
+            </thead>
+            <tbody>
+              {salaryData.map(item => (
+                <tr key={item.teacher._id} className="hover:bg-gray-50">
+                  <td className="table-td font-medium">{item.teacher.name}</td>
+                  <td className="table-td">
+                    {item.assignments.map(a => (
+                      <span key={a._id} className="badge-green mr-1">Cls {a.classId}</span>
+                    )) || 'None'}
+                  </td>
+                  <td className="table-td font-bold">₹{Math.round(item.finalCalculated).toLocaleString()}</td>
+                  <td className="table-td font-medium text-green-600">₹{item.paidAmount?.toLocaleString() || 0}</td>
+                  <td className="table-td">
+                    {item.status === 'paid' ? (<span className="badge-green">Paid</span>) : (item.status === 'partially_paid' ? (<span className="badge-yellow">Partial</span>) : (<span className="badge-red">Pending</span>))}
+                  </td>
+                  <td className="table-td" onClick={e => e.stopPropagation()}>
+                    <div className="flex gap-1">
+                      <button onClick={() => { setSelectedTeacher(item.teacher); setShowSalaryPayment(true); }} className="btn-outline text-xs px-2 py-1">Pay</button>
+                      <button onClick={() => { setSelectedTeacher(item.teacher); setShowSalaryLedger(true); }} className="btn-outline text-xs px-2 py-1">Ledger</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {salaryData.length === 0 && (
+                <tr><td colSpan={6} className="table-td text-center text-mid-grey py-8">No salary data available.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+
+  // Insert rendering in main return
+  // Replace placeholder where tabs are rendered
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Dashboard data
@@ -149,7 +221,8 @@ export default function AdminDashboard() {
     if (tab === 'enquiries') loadEnquiries();
     if (tab === 'feedback') loadFeedbacks();
     if (tab === 'support_chat') loadSupportCount();
-  }, [tab]);
+    if (tab === 'salaries') loadSalaries();
+    }, [tab]);
 
   // Initial load for badges
   useEffect(() => {
@@ -389,6 +462,8 @@ export default function AdminDashboard() {
               </div>
             </div>
           )}
+          {/* ── SALARIES TAB ── */}
+          {tab === 'salaries' && renderSalariesTab()}
 
           {/* ── STUDENTS TAB ── */}
           {tab === 'students' && (
@@ -660,6 +735,29 @@ export default function AdminDashboard() {
       </div>
 
       {/* Modals */}
+      {showSalaryAssignment && (
+        <SalaryAssignmentModal
+          isOpen={showSalaryAssignment}
+          onClose={() => setShowSalaryAssignment(false)}
+          onSuccess={() => { loadSalaries(); }}
+        />
+      )}
+      {showSalaryPayment && selectedTeacher && (
+        <SalaryPaymentModal
+          isOpen={showSalaryPayment}
+          onClose={() => setShowSalaryPayment(false)}
+          teacher={selectedTeacher}
+          onSuccess={() => { loadSalaries(); setSelectedTeacher(null); }}
+        />
+      )}
+      {showSalaryLedger && selectedTeacher && (
+        <SalaryLedgerDrawer
+          isOpen={showSalaryLedger}
+          onClose={() => setShowSalaryLedger(false)}
+          teacher={selectedTeacher}
+          onCloseDrawer={() => setShowSalaryLedger(false)}
+        />
+      )}
       {deleteConfirm && (
         <div className="modal-overlay z-50">
           <div className="modal-box max-w-sm">

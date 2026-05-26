@@ -926,7 +926,7 @@ export default function AdminDashboard() {
           {tab === 'sessions' && <SessionManager />}
           {tab === 'logs' && <LogViewer />}
           {tab === 'support_chat' && <SupportChatsPanel />}
-          {tab === 'settings' && <SettingsPanel />}
+          {/* SettingsPanel rendered within Settings page */}
         </main>
       </div>
 

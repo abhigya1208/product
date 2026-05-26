@@ -20,7 +20,7 @@ import SettingsPanel from '../components/SettingsPanel';
 import SalaryPaymentModal from '../components/SalaryPaymentModal';
 import SalaryLedgerDrawer from '../components/SalaryLedgerDrawer';
 import SalaryAssignmentModal from '../components/SalaryAssignmentModal';
-
+import ThemeToggler from '../components/ThemeToggler';
 
 const NAV = [
   { id: 'dashboard', label: 'Dashboard', icon: '📊' },

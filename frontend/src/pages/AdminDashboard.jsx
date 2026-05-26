@@ -49,6 +49,7 @@ export default function AdminDashboard() {
   const [showSalaryLedger, setShowSalaryLedger] = useState(false);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
 
+  const [tab, setTab] = useState('dashboard');
   const loadSalaries = async () => {
     setSalaryLoading(true);
     try {

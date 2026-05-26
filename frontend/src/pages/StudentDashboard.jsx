@@ -8,6 +8,8 @@ import AnnouncementsPanel from '../components/AnnouncementsPanel';
 import { downloadReceipt } from '../utils/pdf';
 import { MONTH_NAMES } from '../utils/constants';
 import ChangePassword from '../components/ChangePassword';
+import SettingsPanel from '../components/SettingsPanel';
+import ThemeToggler from '../components/ThemeToggler';
 
 const NAV = [
   { id: 'dashboard',     label: 'My Fees',        icon: '💳' },
@@ -89,19 +91,24 @@ export default function StudentDashboard() {
 
       {/* Main */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center gap-3 flex-shrink-0">
-          <button className="lg:hidden p-2 hover:bg-gray-100 rounded-xl" onClick={() => setSidebarOpen(true)}>
-            <svg className="w-5 h-5 text-dark-grey" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
-          </button>
-          <div className="flex-1">
-            <h2 className="text-lg font-bold text-dark-grey">{NAV.find(n => n.id === tab)?.label}</h2>
-            <p className="text-xs text-mid-grey">Welcome back, {user?.name}</p>
-          </div>
-          {totalDue > 0 && (
-            <button onClick={() => setPayModal(true)} className="btn-secondary text-sm px-5 py-2.5 flex items-center gap-2">
-              💳 Pay Due ₹{totalDue}
+        <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between gap-3 flex-shrink-0">
+          <div className="flex items-center gap-3 flex-1">
+            <button className="lg:hidden p-2 hover:bg-gray-100 rounded-xl" onClick={() => setSidebarOpen(true)}>
+              <svg className="w-5 h-5 text-dark-grey" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
             </button>
-          )}
+            <div>
+              <h2 className="text-lg font-bold text-dark-grey">{NAV.find(n => n.id === tab)?.label}</h2>
+              <p className="text-xs text-mid-grey">Welcome back, {user?.name}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <ThemeToggler />
+            {totalDue > 0 && (
+              <button onClick={() => setPayModal(true)} className="btn-secondary text-sm px-5 py-2.5 flex items-center gap-2">
+                💳 Pay Due ₹{totalDue}
+              </button>
+            )}
+          </div>
         </header>
 
         <main className="flex-1 overflow-y-auto p-6">
@@ -206,7 +213,7 @@ export default function StudentDashboard() {
           )}
 
           {tab === 'announcements' && <AnnouncementsPanel canCreate={false} />}
-          {tab === 'settings' && <ChangePassword />}
+          {tab === 'settings' && <SettingsPanel />}
         </main>
       </div>
 

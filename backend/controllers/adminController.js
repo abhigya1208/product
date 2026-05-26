@@ -3,6 +3,8 @@ const Student = require('../models/Student');
 const Payment = require('../models/Payment');
 const Session = require('../models/Session');
 const Log = require('../models/Log');
+const TeacherClass = require('../models/TeacherClass');
+const TeacherSalary = require('../models/TeacherSalary');
 const { generateRollNumber, generatePassword } = require('../utils/rollNumberGenerator');
 const { FEE_STRUCTURE } = require('../utils/pdfGenerator');
 const { exportStudents, exportPayments, exportLogs } = require('../utils/excelExport');
@@ -675,3 +677,340 @@ function calculateFeeStatus(student, payments) {
 }
 
 exports.calculateFeeStatus = calculateFeeStatus;
+
+// ==================== TEACHER CLASS ASSIGNMENT & SALARY MANAGEMENT ====================
+
+/**
+ * Get all teacher class assignments and active teachers
+ * GET /api/admin/teachers/assignments
+ */
+exports.getTeacherAssignments = async (req, res) => {
+  try {
+    const teachers = await User.find({ role: 'teacher', isActive: true }).sort({ name: 1 });
+    const assignments = await TeacherClass.find({}).populate('teacherId', 'name username');
+    res.json({ assignments, teachers });
+  } catch (error) {
+    console.error('Get teacher assignments error:', error);
+    res.status(500).json({ message: 'Server error fetching teacher assignments.' });
+  }
+};
+
+/**
+ * Assign a class and subject to a teacher
+ * POST /api/admin/teachers/assign
+ */
+exports.assignTeacherClasses = async (req, res) => {
+  try {
+    const { teacherId, classId, subject, session } = req.body;
+    if (!teacherId || !classId) {
+      return res.status(400).json({ message: 'Teacher and Class are required.' });
+    }
+    // Check if assignment already exists
+    const existing = await TeacherClass.findOne({ 
+      teacherId, 
+      classId, 
+      subject: subject || '', 
+      session: session || '2026-27' 
+    });
+    if (existing) {
+      return res.status(400).json({ message: 'Teacher is already assigned to this class and subject.' });
+    }
+    const assignment = new TeacherClass({
+      teacherId,
+      classId,
+      subject: subject || '',
+      session: session || '2026-27'
+    });
+    await assignment.save();
+    res.status(201).json({ message: 'Class assigned to teacher successfully.', assignment });
+  } catch (error) {
+    console.error('Assign teacher class error:', error);
+    res.status(500).json({ message: 'Server error assigning class.' });
+  }
+};
+
+/**
+ * Delete a teacher class assignment
+ * DELETE /api/admin/teachers/assign/:id
+ */
+exports.deleteTeacherAssignment = async (req, res) => {
+  try {
+    const assignment = await TeacherClass.findByIdAndDelete(req.params.id);
+    if (!assignment) {
+      return res.status(404).json({ message: 'Assignment not found.' });
+    }
+    res.json({ message: 'Teacher assignment removed successfully.' });
+  } catch (error) {
+    console.error('Delete teacher assignment error:', error);
+    res.status(500).json({ message: 'Server error removing assignment.' });
+  }
+};
+
+/**
+ * Calculate salaries for all teachers for a specific month and year
+ * GET /api/admin/salary/calculate
+ */
+exports.calculateTeacherSalaries = async (req, res) => {
+  try {
+    const targetMonth = parseInt(req.query.month) || (new Date().getMonth() + 1);
+    const targetYear = parseInt(req.query.year) || new Date().getFullYear();
+
+    // 1. Get all active teachers
+    const teachers = await User.find({ role: 'teacher', isActive: true }).sort({ name: 1 });
+
+    // 2. Get all class assignments for session '2026-27'
+    const assignments = await TeacherClass.find({ session: '2026-27' });
+
+    // 3. Count how many teachers teach each class
+    const classTeacherCount = {};
+    assignments.forEach(a => {
+      classTeacherCount[a.classId] = (classTeacherCount[a.classId] || 0) + 1;
+    });
+
+    // 4. Find all completed payments for this month/year
+    const payments = await Payment.find({
+      month: targetMonth,
+      year: targetYear,
+      status: 'completed'
+    }).populate('studentId');
+
+    // 5. Sum completed class fees
+    const classFeesMap = {};
+    payments.forEach(p => {
+      if (p.studentId && !p.studentId.isArchived) {
+        classFeesMap[p.studentId.studentClass] = (classFeesMap[p.studentId.studentClass] || 0) + p.amount;
+      }
+    });
+
+    const salaryData = [];
+
+    for (let i = 0; i < teachers.length; i++) {
+      const teacher = teachers[i];
+      const teacherAssigns = assignments.filter(a => a.teacherId.toString() === teacher._id.toString());
+      
+      // Calculate raw fee share
+      let rawCalculated = 0;
+      const breakdowns = [];
+      
+      teacherAssigns.forEach(a => {
+        const countInClass = classTeacherCount[a.classId] || 1;
+        const feeCollected = classFeesMap[a.classId] || 0;
+        const classShare = (0.60 * feeCollected) / countInClass;
+        rawCalculated += classShare;
+        breakdowns.push({
+          classId: a.classId,
+          subject: a.subject,
+          feeCollected,
+          totalTeachersInClass: countInClass,
+          share: classShare
+        });
+      });
+
+      // 6. Calculate carryover deduction
+      // Find all previous salary records
+      const pastSalaries = await TeacherSalary.find({
+        teacherId: teacher._id,
+        $or: [
+          { year: { $lt: targetYear } },
+          { year: targetYear, month: { $lt: targetMonth } }
+        ]
+      });
+
+      let totalPreviousCalculated = 0;
+      let totalPreviousPaid = 0;
+      pastSalaries.forEach(s => {
+        totalPreviousCalculated += s.calculatedSalary;
+        totalPreviousPaid += s.paidAmount;
+      });
+
+      // Balance carried forward is the extra paid previously
+      const balanceCarriedForward = Math.max(0, totalPreviousPaid - totalPreviousCalculated);
+      
+      // Carryover deduction cannot exceed the raw calculation
+      const carryoverDeduction = Math.min(rawCalculated, balanceCarriedForward);
+
+      // Find if this record already exists in database
+      let salaryRecord = await TeacherSalary.findOne({
+        teacherId: teacher._id,
+        month: targetMonth,
+        year: targetYear
+      });
+
+      if (!salaryRecord) {
+        salaryRecord = new TeacherSalary({
+          teacherId: teacher._id,
+          month: targetMonth,
+          year: targetYear,
+          calculatedSalary: rawCalculated,
+          carryoverDeduction,
+          paidAmount: 0,
+          status: (carryoverDeduction >= rawCalculated && rawCalculated > 0) ? 'paid' : 'pending'
+        });
+        await salaryRecord.save();
+      } else {
+        // Update calculation if still pending/partially paid, preserving payments made
+        if (salaryRecord.status !== 'paid' || salaryRecord.paidAmount === 0) {
+          salaryRecord.calculatedSalary = rawCalculated;
+          salaryRecord.carryoverDeduction = carryoverDeduction;
+          // re-evaluate status
+          const coverage = salaryRecord.paidAmount + carryoverDeduction;
+          if (coverage >= rawCalculated) {
+            salaryRecord.status = 'paid';
+          } else if (coverage > 0) {
+            salaryRecord.status = 'partially_paid';
+          } else {
+            salaryRecord.status = 'pending';
+          }
+          await salaryRecord.save();
+        }
+      }
+
+      salaryData.push({
+        teacher,
+        assignments: teacherAssigns,
+        rawCalculated,
+        carryoverDeduction,
+        balanceCarriedForward,
+        finalCalculated: rawCalculated - carryoverDeduction,
+        paidAmount: salaryRecord.paidAmount,
+        status: salaryRecord.status,
+        payments: salaryRecord.payments,
+        breakdowns
+      });
+    }
+
+    res.json({
+      month: targetMonth,
+      year: targetYear,
+      salaryData
+    });
+  } catch (error) {
+    console.error('Calculate salaries error:', error);
+    res.status(500).json({ message: 'Server error calculating salaries.' });
+  }
+};
+
+/**
+ * Record a salary payout
+ * POST /api/admin/salary/pay
+ */
+exports.payTeacherSalary = async (req, res) => {
+  try {
+    const { teacherId, month, year, paidAmount, paymentMode, transactionReference } = req.body;
+    
+    if (!teacherId || !month || !year || paidAmount === undefined || paidAmount <= 0) {
+      return res.status(400).json({ message: 'Teacher, month, year, and a positive payment amount are required.' });
+    }
+
+    let salaryRecord = await TeacherSalary.findOne({ teacherId, month, year });
+    if (!salaryRecord) {
+      return res.status(404).json({ message: 'Salary record not calculated for this month/year. Please calculate salaries first.' });
+    }
+
+    const newPaidAmount = salaryRecord.paidAmount + parseFloat(paidAmount);
+    salaryRecord.paidAmount = newPaidAmount;
+    
+    // Record this payment in the ledger
+    salaryRecord.payments.push({
+      paidAmount: parseFloat(paidAmount),
+      paymentDate: new Date(),
+      paymentMode: paymentMode || 'cash',
+      transactionReference: transactionReference || ''
+    });
+
+    // Recheck status
+    const coverage = newPaidAmount + salaryRecord.carryoverDeduction;
+    if (coverage >= salaryRecord.calculatedSalary) {
+      salaryRecord.status = 'paid';
+    } else {
+      salaryRecord.status = 'partially_paid';
+    }
+
+    await salaryRecord.save();
+    
+    res.json({ message: 'Salary payment recorded successfully.', salaryRecord });
+  } catch (error) {
+    console.error('Pay teacher salary error:', error);
+    res.status(500).json({ message: 'Server error recording payment.' });
+  }
+};
+
+/**
+ * Fetch a teacher's salary payment ledger
+ * GET /api/admin/salary/ledger/:teacherId
+ */
+exports.getTeacherSalaryLedger = async (req, res) => {
+  try {
+    const { teacherId } = req.params;
+    const history = await TeacherSalary.find({ teacherId })
+      .sort({ year: -1, month: -1 });
+    res.json({ history });
+  } catch (error) {
+    console.error('Get teacher salary ledger error:', error);
+    res.status(500).json({ message: 'Server error fetching salary ledger.' });
+  }
+};
+
+/**
+ * Fetch Monthly salary expense vs. fee collections for charts
+ * GET /api/admin/salary/chart-data
+ */
+exports.getSalaryChartData = async (req, res) => {
+  try {
+    // Aggregate monthly completed fee collections
+    const fees = await Payment.aggregate([
+      { $match: { status: 'completed' } },
+      {
+        $group: {
+          _id: { year: '$year', month: '$month' },
+          totalFees: { $sum: '$amount' }
+        }
+      }
+    ]);
+
+    // Aggregate monthly teacher salaries paid/calculated
+    const salaries = await TeacherSalary.aggregate([
+      {
+        $group: {
+          _id: { year: '$year', month: '$month' },
+          totalCalculatedSalaries: { $sum: '$calculatedSalary' },
+          totalPaidSalaries: { $sum: '$paidAmount' }
+        }
+      }
+    ]);
+
+    // Merge results
+    const chartMap = {};
+    
+    fees.forEach(f => {
+      const key = `${f._id.year}-${String(f._id.month).padStart(2, '0')}`;
+      chartMap[key] = {
+        period: key,
+        fees: f.totalFees,
+        salaryCalculated: 0,
+        salaryPaid: 0
+      };
+    });
+
+    salaries.forEach(s => {
+      const key = `${s._id.year}-${String(s._id.month).padStart(2, '0')}`;
+      if (!chartMap[key]) {
+        chartMap[key] = {
+          period: key,
+          fees: 0,
+          salaryCalculated: 0,
+          salaryPaid: 0
+        };
+      }
+      chartMap[key].salaryCalculated = s.totalCalculatedSalaries;
+      chartMap[key].salaryPaid = s.totalPaidSalaries;
+    });
+
+    const chartData = Object.values(chartMap).sort((a, b) => a.period.localeCompare(b.period)).slice(-12);
+
+    res.json({ chartData });
+  } catch (error) {
+    console.error('Get salary chart data error:', error);
+    res.status(500).json({ message: 'Server error fetching salary chart data.' });
+  }
+};

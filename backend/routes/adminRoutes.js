@@ -18,6 +18,17 @@ router.put('/teachers/:id', logAction('UPDATE_TEACHER'), adminController.updateT
 router.put('/teachers/:id/reset-password', logAction('RESET_TEACHER_PASSWORD'), adminController.resetTeacherPassword);
 router.delete('/teachers/:id', logAction('DELETE_TEACHER'), adminController.deleteTeacher);
 
+// Teacher-Class Assignment
+router.get('/teachers/assignments', adminController.getTeacherAssignments);
+router.post('/teachers/assign', logAction('ASSIGN_TEACHER_CLASSES'), adminController.assignTeacherClasses);
+router.delete('/teachers/assign/:id', logAction('REMOVE_TEACHER_ASSIGNMENT'), adminController.deleteTeacherAssignment);
+
+// Salary Management
+router.get('/salary/calculate', adminController.calculateTeacherSalaries);
+router.post('/salary/pay', logAction('PAY_TEACHER_SALARY'), adminController.payTeacherSalary);
+router.get('/salary/ledger/:teacherId', adminController.getTeacherSalaryLedger);
+router.get('/salary/chart-data', adminController.getSalaryChartData);
+
 // Student management
 router.post('/students', logAction('ADD_STUDENT'), adminController.addStudent);
 router.post('/students/bulk-import', logAction('BULK_IMPORT_STUDENTS'), adminController.bulkImportStudents);

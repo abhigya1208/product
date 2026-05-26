@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const Student = require('../models/Student');
 const Payment = require('../models/Payment');
+const TeacherClass = require('../models/TeacherClass');
+const TeacherSalary = require('../models/TeacherSalary');
 const { generateRollNumber, generatePassword } = require('../utils/rollNumberGenerator');
 const { FEE_STRUCTURE } = require('../utils/pdfGenerator');
 
@@ -347,3 +349,73 @@ function calculateFeeStatus(student, payments) {
 
   return statuses;
 }
+
+/**
+ * Fetch salary, assigned classes, and student fee contribution transparency
+ * GET /api/teacher/salary/my-earnings
+ */
+exports.getMyEarnings = async (req, res) => {
+  try {
+    const teacherId = req.user._id;
+
+    // 1. Get all classes assigned to this teacher
+    const myAssignments = await TeacherClass.find({ teacherId, session: '2026-27' });
+    const myClassIds = myAssignments.map(a => a.classId);
+
+    // 2. Count teachers in each class to get splits
+    const allAssignments = await TeacherClass.find({ classId: { $in: myClassIds }, session: '2026-27' });
+    const classTeacherCount = {};
+    allAssignments.forEach(a => {
+      classTeacherCount[a.classId] = (classTeacherCount[a.classId] || 0) + 1;
+    });
+
+    // 3. Get all active students in these classes
+    const students = await Student.find({
+      studentClass: { $in: myClassIds },
+      isArchived: false
+    }).sort({ name: 1 });
+
+    const studentIds = students.map(s => s._id);
+
+    // 4. Get completed payments for these students
+    const payments = await Payment.find({
+      studentId: { $in: studentIds },
+      status: 'completed'
+    }).populate('studentId').sort({ paidAt: -1 });
+
+    // 5. Build contribution transparency list
+    const contributions = payments.map(p => {
+      const classId = p.studentId.studentClass;
+      const totalTeachers = classTeacherCount[classId] || 1;
+      const rawShare = (0.60 * p.amount) / totalTeachers;
+
+      return {
+        _id: p._id,
+        studentName: p.studentId.name,
+        rollNumber: p.studentId.rollNumber,
+        studentClass: classId,
+        section: p.studentId.section,
+        amount: p.amount,
+        month: p.month,
+        year: p.year,
+        paidAt: p.paidAt,
+        totalTeachers,
+        contributionShare: rawShare
+      };
+    });
+
+    // 6. Fetch my salary histories/ledgers
+    const salaryHistory = await TeacherSalary.find({ teacherId })
+      .sort({ year: -1, month: -1 });
+
+    res.json({
+      assignments: myAssignments,
+      contributions,
+      salaryHistory
+    });
+
+  } catch (error) {
+    console.error('Get my earnings error:', error);
+    res.status(500).json({ message: 'Server error fetching earnings.' });
+  }
+};

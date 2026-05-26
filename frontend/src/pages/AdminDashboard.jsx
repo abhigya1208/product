@@ -16,18 +16,22 @@ import SupportChatsPanel from '../components/SupportChatsPanel';
 import FeeTable from '../components/FeeTable';
 import { FEE_STRUCTURE, CLASSES, MONTH_NAMES } from '../utils/constants';
 import { useSocket } from '../context/SocketContext';
+import SettingsPanel from '../components/SettingsPanel';
+import ThemeToggler from '../components/ThemeToggler';
 
 const NAV = [
   { id: 'dashboard', label: 'Dashboard', icon: '📊' },
   { id: 'students',  label: 'Students',  icon: '👨‍🎓' },
   { id: 'teachers',  label: 'Teachers',  icon: '👩‍🏫' },
   { id: 'payments',  label: 'Payments',  icon: '💳' },
+  { id: 'salaries',  label: 'Salaries',  icon: '💰' },
   { id: 'announcements', label: 'Announcements', icon: '📢' },
   { id: 'feedback',  label: 'Feedback',  icon: '⭐' },
   { id: 'enquiries', label: 'Enquiries', icon: '📩' },
   { id: 'support_chat', label: 'Support Chats', icon: '💬' },
   { id: 'sessions',  label: 'Sessions',  icon: '🔐' },
   { id: 'logs',      label: 'Logs',      icon: '📋' },
+  { id: 'settings',  label: 'Settings',  icon: '⚙️' },
 ];
 
 export default function AdminDashboard() {
@@ -356,6 +360,7 @@ export default function AdminDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <ThemeToggler />
             {tab === 'students' && <ExportButton endpoint="/admin/export/students" filename="students.xlsx" label="Export Students" />}
             {tab === 'payments' && <ExportButton endpoint="/admin/export/payments" filename="payments.xlsx" label="Export Payments" />}
             {tab === 'logs' && <ExportButton endpoint="/admin/export/logs" filename="logs.xlsx" label="Export Logs" />}
@@ -650,6 +655,7 @@ export default function AdminDashboard() {
           {tab === 'sessions' && <SessionManager />}
           {tab === 'logs' && <LogViewer />}
           {tab === 'support_chat' && <SupportChatsPanel />}
+          {tab === 'settings' && <SettingsPanel />}
         </main>
       </div>
 

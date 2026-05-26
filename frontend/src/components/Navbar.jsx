@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import ThemeToggler from './ThemeToggler';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -46,6 +47,9 @@ export default function Navbar() {
             <Link to="/admissions" className="text-dark-grey hover:text-pastel-green-dark font-medium transition-colors">Admissions</Link>
             <Link to="/academics" className="text-dark-grey hover:text-pastel-green-dark font-medium transition-colors">Academics</Link>
             <Link to="/contact" className="text-dark-grey hover:text-pastel-green-dark font-medium transition-colors">Contact Us</Link>
+
+            {/* Theme Toggle */}
+            <ThemeToggler />
 
             {/* Login Dropdown */}
             <div className="relative" ref={dropRef}>
@@ -97,7 +101,11 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
-            <div className="mt-2 border-t border-gray-100 pt-2">
+            <div className="mt-2 border-t border-gray-100 pt-2 flex items-center justify-between px-4 py-2">
+              <span className="text-sm font-medium text-dark-grey">Appearance</span>
+              <ThemeToggler />
+            </div>
+            <div className="border-t border-gray-100 pt-2">
               {[['student','👨‍🎓 Student Login'],['teacher','👩‍🏫 Teacher Login'],['admin','🔐 Admin Login']].map(([role, label]) => (
                 <button key={role} onClick={() => goLogin(role)}
                   className="block w-full text-left px-4 py-3 rounded-xl hover:bg-pastel-green/20 text-sm text-dark-grey">

@@ -11,6 +11,9 @@ router.use(auth, roleCheck('teacher', 'admin'));
 // Dashboard
 router.get('/dashboard', teacherController.getDashboardStats);
 
+// Salary & Earnings
+router.get('/salary/my-earnings', teacherController.getMyEarnings);
+
 // Student management
 router.post('/students', logAction('TEACHER_ADD_STUDENT'), teacherController.addStudent);
 router.get('/students', teacherController.getStudents);

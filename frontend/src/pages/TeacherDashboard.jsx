@@ -8,12 +8,15 @@ import AnnouncementsPanel from '../components/AnnouncementsPanel';
 import ChatInterface from '../components/ChatInterface';
 import ChangePassword from '../components/ChangePassword';
 import StatsCard from '../components/StatsCard';
+import SettingsPanel from '../components/SettingsPanel';
+import ThemeToggler from '../components/ThemeToggler';
 import { CLASSES, MONTH_NAMES, FEE_STRUCTURE } from '../utils/constants';
 
 const NAV = [
   { id: 'dashboard',     label: 'Dashboard',     icon: '📊' },
   { id: 'students',      label: 'Students',      icon: '👨‍🎓' },
   { id: 'pending',       label: 'Pending Fees',  icon: '⚠️' },
+  { id: 'earnings',      label: 'My Earnings',   icon: '💰' },
   { id: 'announcements', label: 'Announcements', icon: '📢' },
   { id: 'chat',          label: 'Chat',          icon: '💬' },
   { id: 'settings',      label: 'Settings',      icon: '⚙️' },
@@ -135,13 +138,18 @@ export default function TeacherDashboard() {
 
       {/* Main */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center gap-3 flex-shrink-0">
-          <button className="lg:hidden p-2 hover:bg-gray-100 rounded-xl" onClick={() => setSidebarOpen(true)}>
-            <svg className="w-5 h-5 text-dark-grey" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
-          </button>
+        <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <button className="lg:hidden p-2 hover:bg-gray-100 rounded-xl" onClick={() => setSidebarOpen(true)}>
+              <svg className="w-5 h-5 text-dark-grey" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+            </button>
+            <div>
+              <h2 className="text-lg font-bold text-dark-grey">{NAV.find(n => n.id === tab)?.label}</h2>
+              <p className="text-xs text-mid-grey">{new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+            </div>
+          </div>
           <div>
-            <h2 className="text-lg font-bold text-dark-grey">{NAV.find(n => n.id === tab)?.label}</h2>
-            <p className="text-xs text-mid-grey">{new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+            <ThemeToggler />
           </div>
         </header>
 
@@ -276,7 +284,7 @@ export default function TeacherDashboard() {
 
           {tab === 'announcements' && <AnnouncementsPanel canCreate={true} />}
           {tab === 'chat' && <ChatInterface />}
-          {tab === 'settings' && <ChangePassword />}
+          {tab === 'settings' && <SettingsPanel />}
         </main>
       </div>
 

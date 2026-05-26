@@ -44,7 +44,8 @@ export default function AdminDashboard() {
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [selectedTeacherDetail, setSelectedTeacherDetail] = useState(null);
   const [tab, setTab] = useState('dashboard');
-const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [openSubmenu, setOpenSubmenu] = useState(null);
   const loadSalaries = async () => {
     setSalaryLoading(true);
     try {

@@ -5,7 +5,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    allowedHosts: ["anemic-upper-joystick.ngrok-free.dev"]
-    // ya simple: "all"
+    allowedHosts: ["anemic-upper-joystick.ngrok-free.dev"],
+    // ysimple: "all"
+    port: 5173
   }
 })

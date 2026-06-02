@@ -22,16 +22,16 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-pastel-green hover:bg-pastel-green-dark text-dark-grey font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 shadow-soft hover:shadow-card active:scale-95;
+    @apply bg-pastel-green hover:bg-pastel-green-dark text-dark-grey font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 shadow-soft hover:shadow-card active:scale-95 dark:text-slate-900;
   }
   .btn-secondary {
-    @apply bg-pastel-peach hover:bg-pastel-peach-dark text-dark-grey font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 shadow-soft hover:shadow-card active:scale-95;
+    @apply bg-pastel-peach hover:bg-pastel-peach-dark text-dark-grey font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 shadow-soft hover:shadow-card active:scale-95 dark:text-slate-900;
   }
   .btn-outline {
-    @apply border-2 border-pastel-green text-dark-grey font-semibold px-5 py-2.5 rounded-xl hover:bg-pastel-green transition-all duration-200 active:scale-95;
+    @apply border-2 border-pastel-green text-dark-grey dark:text-gray-100 font-semibold px-5 py-2.5 rounded-xl hover:bg-pastel-green hover:text-dark-grey transition-all duration-200 active:scale-95;
   }
   .btn-danger {
-    @apply bg-red-100 hover:bg-red-200 text-red-700 font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 active:scale-95;
+    @apply bg-red-100 hover:bg-red-200 text-red-700 dark:bg-red-900/40 dark:hover:bg-red-900/60 dark:text-red-300 font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 active:scale-95;
   }
   .card {
     @apply bg-white dark:bg-slate-900 rounded-2xl shadow-card p-6 border border-gray-100 dark:border-slate-800 transition-all duration-200;
@@ -43,16 +43,16 @@
     @apply block text-sm font-medium text-dark-grey dark:text-gray-200 mb-1.5;
   }
   .badge-green {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800;
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300;
   }
   .badge-red {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700;
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300;
   }
   .badge-yellow {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800;
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300;
   }
   .badge-blue {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800;
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300;
   }
   .sidebar-link {
     @apply flex items-center gap-3 px-4 py-3 rounded-xl text-dark-grey dark:text-gray-200 hover:bg-pastel-green/30 dark:hover:bg-slate-800 transition-all duration-150 font-medium cursor-pointer;

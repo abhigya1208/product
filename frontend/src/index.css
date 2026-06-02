@@ -88,12 +88,7 @@
 
 /* Animations */
 .animate-count { animation: countUp 1s ease-out; }
-@layer utilities {
-  .dark .bg-white { @apply bg-slate-900; }
-  .dark .bg-cream { @apply bg-slate-800; }
-  .dark .text-dark-grey { @apply text-gray-100; }
-  .dark .text-mid-grey { @apply text-gray-300; }
-  .dark .border-gray-100 { @apply border-gray-700; }
-  .dark .border-gray-200 { @apply border-gray-600; }
-  .dark .border-gray-50 { @apply border-gray-800; }
-}
+/* Dark scrollbar */
+.dark ::-webkit-scrollbar-track { background: #1e293b; border-radius: 10px; }
+.dark ::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }

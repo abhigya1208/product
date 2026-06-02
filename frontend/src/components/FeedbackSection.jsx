@@ -37,12 +37,12 @@ export default function FeedbackSection() {
   };
 
   return (
-    <section id="feedback" className="py-20 bg-cream">
+    <section id="feedback" className="py-20 bg-cream dark:bg-gray-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row items-center justify-between mb-12">
           <div>
-            <span className="inline-block bg-pastel-yellow/50 text-dark-grey text-sm font-semibold px-4 py-1.5 rounded-full mb-4">Testimonials</span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-dark-grey">What Parents & Students Say</h2>
+            <span className="inline-block bg-pastel-yellow/50 dark:bg-yellow-950/20 text-dark-grey dark:text-yellow-400 text-sm font-semibold px-4 py-1.5 rounded-full mb-4">Testimonials</span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-dark-grey dark:text-white">What Parents & Students Say</h2>
           </div>
           <button onClick={() => setShowModal(true)} className="btn-secondary mt-6 md:mt-0 shadow-sm">
             Leave Feedback
@@ -52,21 +52,21 @@ export default function FeedbackSection() {
         {feedbacks.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {feedbacks.map(f => (
-              <div key={f._id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+              <div key={f._id} className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm dark:shadow-none border border-gray-100 dark:border-slate-800 flex flex-col justify-between">
                 <div>
                   <div className="flex text-yellow-500 mb-4 text-sm">
                     {Array.from({length: 5}).map((_, i) => (
                       <span key={i} className={i < f.rating ? 'opacity-100' : 'opacity-30'}>★</span>
                     ))}
                   </div>
-                  <p className="text-dark-grey italic text-sm mb-6 leading-relaxed">"{f.message}"</p>
+                  <p className="text-dark-grey dark:text-gray-200 italic text-sm mb-6 leading-relaxed">"{f.message}"</p>
                 </div>
-                <p className="font-bold text-dark-grey text-sm">— {f.name || 'Anonymous'}</p>
+                <p className="font-bold text-dark-grey dark:text-gray-100 text-sm">— {f.name || 'Anonymous'}</p>
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-10 text-mid-grey">
+          <div className="text-center py-10 text-mid-grey dark:text-gray-400">
             No feedback entries available yet. 
           </div>
         )}
@@ -78,12 +78,12 @@ export default function FeedbackSection() {
             {status === 'success' ? (
               <div className="text-center py-8">
                 <div className="text-5xl mb-4">🎉</div>
-                <h3 className="text-xl font-bold text-dark-grey mb-2">Feedback Submitted!</h3>
-                <p className="text-mid-grey text-sm">Thank you. Your feedback has been sent for review.</p>
+                <h3 className="text-xl font-bold text-dark-grey dark:text-white mb-2">Feedback Submitted!</h3>
+                <p className="text-mid-grey dark:text-gray-400 text-sm">Thank you. Your feedback has been sent for review.</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit}>
-                <h3 className="text-xl font-bold text-dark-grey mb-6">Leave Feedback</h3>
+                <h3 className="text-xl font-bold text-dark-grey dark:text-white mb-6">Leave Feedback</h3>
                 
                 <div className="mb-4">
                   <label className="label">Your Name (optional)</label>

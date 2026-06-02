@@ -33,20 +33,20 @@ const features = [
 
 export default function WhyChooseUs() {
   return (
-    <section id="why" className="py-20 bg-white">
+    <section id="why" className="py-20 bg-white dark:bg-gray-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
-          <span className="inline-block bg-pastel-peach/50 text-dark-grey text-sm font-semibold px-4 py-1.5 rounded-full mb-3">Why AGS Tutorial?</span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-dark-grey">What Makes Us Different</h2>
-          <p className="mt-3 text-mid-grey max-w-xl mx-auto">Committed to providing quality education and shaping bright futures since 2022.</p>
+          <span className="inline-block bg-pastel-peach/50 dark:bg-orange-950/30 text-dark-grey dark:text-orange-300 text-sm font-semibold px-4 py-1.5 rounded-full mb-3">Why AGS Tutorial?</span>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-dark-grey dark:text-white">What Makes Us Different</h2>
+          <p className="mt-3 text-mid-grey dark:text-gray-400 max-w-xl mx-auto">Committed to providing quality education and shaping bright futures since 2022.</p>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((f, i) => (
             <div key={i}
-              className="group p-6 rounded-2xl border border-gray-100 hover:border-pastel-green hover:shadow-card transition-all duration-300 hover:-translate-y-1 bg-white">
+              className="group p-6 rounded-2xl border border-gray-100 dark:border-slate-800 hover:border-pastel-green dark:hover:border-pastel-green hover:shadow-card dark:hover:shadow-none transition-all duration-300 hover:-translate-y-1 bg-white dark:bg-slate-900">
               <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-200">{f.icon}</div>
-              <h3 className="text-lg font-bold text-dark-grey mb-2">{f.title}</h3>
-              <p className="text-mid-grey text-sm leading-relaxed">{f.desc}</p>
+              <h3 className="text-lg font-bold text-dark-grey dark:text-white mb-2">{f.title}</h3>
+              <p className="text-mid-grey dark:text-gray-400 text-sm leading-relaxed">{f.desc}</p>
             </div>
           ))}
         </div>

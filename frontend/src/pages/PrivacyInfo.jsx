@@ -2,24 +2,24 @@ import { Link } from 'react-router-dom';
 
 export default function PrivacyInfo() {
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-cream dark:bg-gray-950">
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <Link to="/" className="inline-flex items-center gap-2 text-mid-grey hover:text-dark-grey mb-8 text-sm">
+        <Link to="/" className="inline-flex items-center gap-2 text-mid-grey dark:text-gray-400 hover:text-dark-grey dark:hover:text-gray-200 mb-8 text-sm">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           Back to Home
         </Link>
         <div className="card">
-          <div className="flex items-center gap-3 mb-6 pb-6 border-b border-gray-100">
+          <div className="flex items-center gap-3 mb-6 pb-6 border-b border-gray-100 dark:border-slate-800">
             <img src="/logo.png" alt="AGS Tutorial" className="h-12 w-12 object-contain rounded-xl" />
             <div>
-              <h1 className="text-2xl font-extrabold text-dark-grey">Privacy Policy</h1>
-              <p className="text-sm text-mid-grey">AGS Tutorial · Last updated: April 2025</p>
+              <h1 className="text-2xl font-extrabold text-dark-grey dark:text-white">Privacy Policy</h1>
+              <p className="text-sm text-mid-grey dark:text-gray-400">AGS Tutorial · Last updated: April 2025</p>
             </div>
           </div>
 
-          <div className="prose prose-sm max-w-none text-dark-grey space-y-6">
+          <div className="prose prose-sm max-w-none text-dark-grey dark:text-gray-200 space-y-6">
             {[
               {
                 title: '1. Information We Collect',
@@ -63,8 +63,8 @@ export default function PrivacyInfo() {
               },
             ].map((section, i) => (
               <div key={i}>
-                <h2 className="text-base font-bold text-dark-grey mb-2">{section.title}</h2>
-                <p className="text-mid-grey text-sm leading-relaxed whitespace-pre-line">{section.content}</p>
+                <h2 className="text-base font-bold text-dark-grey dark:text-gray-100 mb-2">{section.title}</h2>
+                <p className="text-mid-grey dark:text-gray-400 text-sm leading-relaxed whitespace-pre-line">{section.content}</p>
               </div>
             ))}
           </div>

@@ -66,16 +66,16 @@ export default function AdminDashboard() {
         <button onClick={() => setShowSalaryAssignment(true)} className="btn-primary text-sm px-4 py-2">Assign Class</button>
       </div>
       {salaryLoading ? (
-        <p className="text-mid-grey">Loading salaries...</p>
+        <p className="text-mid-grey dark:text-gray-400">Loading salaries...</p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-gray-100">
+        <div className="overflow-x-auto rounded-xl border border-gray-100 dark:border-slate-800">
           <table className="w-full min-w-[800px]">
             <thead>
               <tr>{['Teacher', 'Class Assignments', 'Calculated Salary', 'Paid', 'Status', 'Actions'].map(h => <th key={h} className="table-th">{h}</th>)}</tr>
             </thead>
             <tbody>
               {salaryData.map(item => (
-                <tr key={item.teacher._id} className="hover:bg-gray-50">
+                <tr key={item.teacher._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/60">
                   <td className="table-td font-medium">{item.teacher.name}</td>
                   <td className="table-td">
                     {item.assignments.map(a => (
@@ -83,7 +83,7 @@ export default function AdminDashboard() {
                     )) || 'None'}
                   </td>
                   <td className="table-td font-bold">₹{Math.round(item.finalCalculated).toLocaleString()}</td>
-                  <td className="table-td font-medium text-green-600">₹{item.paidAmount?.toLocaleString() || 0}</td>
+                  <td className="table-td font-medium text-green-600 dark:text-green-400">₹{item.paidAmount?.toLocaleString() || 0}</td>
                   <td className="table-td">
                     {item.status === 'paid' ? (<span className="badge-green">Paid</span>) : (item.status === 'partially_paid' ? (<span className="badge-yellow">Partial</span>) : (<span className="badge-red">Pending</span>))}
                   </td>
@@ -96,7 +96,7 @@ export default function AdminDashboard() {
                 </tr>
               ))}
               {salaryData.length === 0 && (
-                <tr><td colSpan={6} className="table-td text-center text-mid-grey py-8">No salary data available.</td></tr>
+                <tr><td colSpan={6} className="table-td text-center text-mid-grey dark:text-gray-400 py-8">No salary data available.</td></tr>
               )}
             </tbody>
           </table>
@@ -370,18 +370,18 @@ export default function AdminDashboard() {
   const switchTab = (t) => { setTab(t); setSidebarOpen(false); };
 
   return (<ErrorBoundary>
-    <div className="flex h-screen bg-cream overflow-hidden">
+    <div className="flex h-screen bg-cream dark:bg-gray-950 overflow-hidden">
       {/* Sidebar */}
       <>
         {/* Overlay for mobile */}
         {sidebarOpen && <div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={() => setSidebarOpen(false)} />}
-        <aside className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-100 flex flex-col transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+        <aside className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white dark:bg-slate-900 border-r border-gray-100 dark:border-slate-800 flex flex-col transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
           {/* Logo */}
-          <div className="p-5 border-b border-gray-100 flex items-center gap-3">
+          <div className="p-5 border-b border-gray-100 dark:border-slate-800 flex items-center gap-3">
             <img src="/logo.png" alt="AGS" className="h-10 w-10 object-contain rounded-xl" />
             <div>
-              <p className="font-bold text-sm text-dark-grey">AGS Tutorial</p>
-              <p className="text-xs text-mid-grey capitalize">Admin Portal</p>
+              <p className="font-bold text-sm text-dark-grey dark:text-gray-100">AGS Tutorial</p>
+              <p className="text-xs text-mid-grey dark:text-gray-400 capitalize">Admin Portal</p>
             </div>
           </div>
 
@@ -430,14 +430,14 @@ export default function AdminDashboard() {
           </nav>
 
           {/* User */}
-          <div className="p-4 border-t border-gray-100">
+          <div className="p-4 border-t border-gray-100 dark:border-slate-800">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-full bg-pastel-peach flex items-center justify-center font-bold text-dark-grey">
+              <div className="w-9 h-9 rounded-full bg-pastel-peach flex items-center justify-center font-bold text-dark-grey dark:text-gray-100">
                 {user?.name?.[0]?.toUpperCase()}
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-dark-grey truncate">{user?.name}</p>
-                <p className="text-xs text-mid-grey">Administrator</p>
+                <p className="text-sm font-semibold text-dark-grey dark:text-gray-100 truncate">{user?.name}</p>
+                <p className="text-xs text-mid-grey dark:text-gray-400">Administrator</p>
               </div>
             </div>
             <button onClick={handleLogout} className="btn-danger w-full text-sm py-2">Logout</button>
@@ -448,16 +448,16 @@ export default function AdminDashboard() {
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top bar */}
-        <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between flex-shrink-0">
+        <header className="bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 px-6 py-4 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-3">
-            <button className="lg:hidden p-2 hover:bg-gray-100 rounded-xl" onClick={() => setSidebarOpen(true)}>
-              <svg className="w-5 h-5 text-dark-grey" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button className="lg:hidden p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl" onClick={() => setSidebarOpen(true)}>
+              <svg className="w-5 h-5 text-dark-grey dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
             <div>
-              <h2 className="text-lg font-bold text-dark-grey">{NAV.find(n => n.id === tab)?.label}</h2>
-              <p className="text-xs text-mid-grey">{new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+              <h2 className="text-lg font-bold text-dark-grey dark:text-gray-100">{NAV.find(n => n.id === tab)?.label}</h2>
+              <p className="text-xs text-mid-grey dark:text-gray-400">{new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -497,12 +497,12 @@ export default function AdminDashboard() {
           {tab === 'settings' && (
              <div className="flex h-full">
                {/* Left Sub-Nav */}
-               <nav className="w-48 border-r border-gray-100">
+               <nav className="w-48 border-r border-gray-100 dark:border-slate-800">
                  {settingsNav.map((item) => (
                    <button
                      key={item.id}
                      onClick={() => setSettingsSubTab(item.id)}
-                     className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${settingsSubTab === item.id ? 'bg-gray-200 font-semibold' : ''}`}
+                     className={`w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-800 ${settingsSubTab === item.id ? 'bg-gray-200 dark:bg-slate-700 font-semibold' : ''}`}
                    >
                      {item.label}
                    </button>
@@ -523,25 +523,25 @@ export default function AdminDashboard() {
                          <div key={f._id} className="card flex flex-col justify-between">
                            <div>
                              <div className="flex items-center justify-between mb-2">
-                               <span className="font-semibold text-dark-grey">{f.name || 'Anonymous'}</span>
+                               <span className="font-semibold text-dark-grey dark:text-gray-100">{f.name || 'Anonymous'}</span>
                                <div className="flex text-yellow-500">
                                  {Array.from({ length: 5 }).map((_, i) => (
                                    <span key={i} className={i < f.rating ? 'opacity-100' : 'opacity-30'}>★</span>
                                  ))}
                                </div>
                              </div>
-                             <p className="text-mid-grey text-sm mb-4 line-clamp-4">{f.message}</p>
+                             <p className="text-mid-grey dark:text-gray-400 text-sm mb-4 line-clamp-4">{f.message}</p>
                            </div>
-                           <div className="flex items-center gap-2 pt-4 border-t border-gray-100">
+                           <div className="flex items-center gap-2 pt-4 border-t border-gray-100 dark:border-slate-800">
                              <button
                                onClick={() => toggleFeedbackApproval(f._id, f.isApproved)}
-                               className={`text-xs px-3 py-1.5 rounded-full flex-1 ${f.isApproved ? 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100' : 'bg-green-50 text-green-600 border border-green-200 hover:bg-green-100'}`}
+                               className={`text-xs px-3 py-1.5 rounded-full flex-1 ${f.isApproved ? 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40' : 'bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 dark:bg-green-950/40 dark:text-green-400 dark:border-green-900/50 dark:hover:bg-green-900/40'}`}
                              >
                                {f.isApproved ? 'Revoke Approval' : 'Approve Publicly'}
                              </button>
                              <button
                                onClick={() => deleteFeedback(f._id)}
-                               className="text-xs px-3 py-1.5 rounded-full text-gray-500 border border-gray-200 hover:bg-gray-100"
+                               className="text-xs px-3 py-1.5 rounded-full text-gray-500 border border-gray-200 hover:bg-gray-100 dark:text-gray-400 dark:border-slate-700 dark:hover:bg-slate-800"
                              >
                                Delete
                              </button>
@@ -549,7 +549,7 @@ export default function AdminDashboard() {
                          </div>
                        ))}
                        {feedbacks.length === 0 && (
-                         <div className="col-span-full text-center py-10 text-mid-grey border border-dashed border-gray-200 rounded-xl">
+                         <div className="col-span-full text-center py-10 text-mid-grey dark:text-gray-400 border border-dashed border-gray-200 dark:border-slate-700 rounded-xl">
                            No feedback received yet.
                          </div>
                        )}
@@ -561,22 +561,22 @@ export default function AdminDashboard() {
                      <div className="flex items-center justify-between mb-5">
                        <h3 className="section-title text-xl">Enquiries ({enquiries.length})</h3>
                      </div>
-                     <div className="overflow-x-auto rounded-xl border border-gray-100">
+                     <div className="overflow-x-auto rounded-xl border border-gray-100 dark:border-slate-800">
                        <table className="w-full min-w-[800px]">
                          <thead>
                            <tr>{['Status', 'Date', 'Name', 'Contact', 'Message', 'Actions'].map(h => <th key={h} className="table-th">{h}</th>)}</tr>
                          </thead>
                          <tbody>
                            {enquiries.map(e => (
-                             <tr key={e._id} className={e.status === 'Unread' ? 'bg-blue-50/30 font-semibold' : 'hover:bg-gray-50'}>
+                             <tr key={e._id} className={e.status === 'Unread' ? 'bg-blue-50/30 dark:bg-blue-950/20 font-semibold' : 'hover:bg-gray-50 dark:hover:bg-slate-800/60'}>
                                <td className="table-td">
                                  {e.status === 'Unread' && <span className="badge-red">Unread</span>}
                                  {e.status === 'Read' && <span className="badge-blue">Read</span>}
                                  {e.status === 'Resolved' && <span className="badge-green">Resolved</span>}
                                </td>
-                               <td className="table-td text-xs text-mid-grey">{new Date(e.createdAt).toLocaleString('en-IN', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})}</td>
+                               <td className="table-td text-xs text-mid-grey dark:text-gray-400">{new Date(e.createdAt).toLocaleString('en-IN', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})}</td>
                                <td className="table-td">{e.name}</td>
-                               <td className="table-td text-xs"><>{e.email}<br/><span className="text-mid-grey">{e.phone || 'No phone'}</span></></td>
+                               <td className="table-td text-xs"><>{e.email}<br/><span className="text-mid-grey dark:text-gray-400">{e.phone || 'No phone'}</span></></td>
                                <td className="table-td text-sm min-w-[250px] whitespace-normal">{e.message}</td>
                                <td className="table-td">
                                  <select className="input text-xs py-1" value={e.status || 'Unread'} onChange={(ev) => updateEnquiryStatus(e._id, ev.target.value)}>
@@ -608,31 +608,31 @@ export default function AdminDashboard() {
                          </select>
                        </div>
                      </div>
-                     <div className="overflow-x-auto rounded-xl border border-gray-100">
+                     <div className="overflow-x-auto rounded-xl border border-gray-100 dark:border-slate-800">
                        <table className="w-full min-w-[700px]">
                          <thead>
                            <tr>{['Student', 'Class', 'Month', 'Amount', 'Type', 'Date', 'Slip/TxnID'].map(h => <th key={h} className="table-th">{h}</th>)}</tr>
                          </thead>
                          <tbody>
                            {payments.map(p => (
-                             <tr key={p._id} className="hover:bg-gray-50">
-                               <td className="table-td"><p className="font-medium">{p.studentId?.name}</p><p className="text-xs text-mid-grey font-mono">{p.studentId?.rollNumber}</p></td>
+                             <tr key={p._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/60">
+                               <td className="table-td"><p className="font-medium">{p.studentId?.name}</p><p className="text-xs text-mid-grey dark:text-gray-400 font-mono">{p.studentId?.rollNumber}</p></td>
                                <td className="table-td"><span className="badge-green">Cls {p.studentId?.studentClass}</span></td>
                                <td className="table-td text-sm">{MONTH_NAMES[(p.month||1)-1].slice(0,3)} {p.year}</td>
                                <td className="table-td font-bold">₹{p.amount}</td>
                                <td className="table-td"><span className={p.type === 'online' ? 'badge-blue' : 'badge-yellow'}>{p.type}</span></td>
-                               <td className="table-td text-xs text-mid-grey">{new Date(p.paidAt).toLocaleDateString('en-IN')}</td>
-                               <td className="table-td text-xs font-mono text-mid-grey">{p.slipNumber || p.razorpayPaymentId?.slice(-8) || 'N/A'}</td>
+                               <td className="table-td text-xs text-mid-grey dark:text-gray-400">{new Date(p.paidAt).toLocaleDateString('en-IN')}</td>
+                               <td className="table-td text-xs font-mono text-mid-grey dark:text-gray-400">{p.slipNumber || p.razorpayPaymentId?.slice(-8) || 'N/A'}</td>
                              </tr>
                            ))}
                            {payments.length === 0 && (
-                             <tr><td colSpan={7} className="table-td text-center text-mid-grey py-8">No payments found.</td></tr>
+                             <tr><td colSpan={7} className="table-td text-center text-mid-grey dark:text-gray-400 py-8">No payments found.</td></tr>
                            )}
                          </tbody>
                        </table>
                      </div>
                      <div className="flex justify-between items-center mt-4">
-                       <p className="text-sm text-mid-grey">Showing {payments.length} of {paymentTotal}</p>
+                       <p className="text-sm text-mid-grey dark:text-gray-400">Showing {payments.length} of {paymentTotal}</p>
                        <div className="flex gap-2">
                          <button onClick={() => loadPayments(paymentPage - 1)} disabled={paymentPage <= 1} className="btn-outline text-sm px-4 py-1.5 disabled:opacity-40">← Prev</button>
                          <button onClick={() => loadPayments(paymentPage + 1)} disabled={payments.length < 20} className="btn-outline text-sm px-4 py-1.5 disabled:opacity-40">Next →</button>
@@ -651,18 +651,18 @@ export default function AdminDashboard() {
               {/* Student detail drawer */}
               {selectedStudent && (
                 <div className="fixed inset-0 bg-black/40 z-50 flex justify-end">
-                  <div className="w-full max-w-lg bg-white h-full overflow-y-auto shadow-xl animate-slide-up">
-                    <div className="flex items-center justify-between p-5 border-b border-gray-100 sticky top-0 bg-white z-10">
+                  <div className="w-full max-w-lg bg-white dark:bg-slate-900 h-full overflow-y-auto shadow-xl dark:shadow-black/50 animate-slide-up">
+                    <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-slate-800 sticky top-0 bg-white dark:bg-slate-900 z-10">
                       <div>
-                        <h3 className="font-bold text-dark-grey">{selectedStudent.name}</h3>
-                        <p className="text-sm text-mid-grey">{selectedStudent.rollNumber} · Class {selectedStudent.studentClass}-{selectedStudent.section}</p>
+                        <h3 className="font-bold text-dark-grey dark:text-gray-100">{selectedStudent.name}</h3>
+                        <p className="text-sm text-mid-grey dark:text-gray-400">{selectedStudent.rollNumber} · Class {selectedStudent.studentClass}-{selectedStudent.section}</p>
                       </div>
-                      <button onClick={() => setSelectedStudent(null)} className="text-2xl text-mid-grey hover:text-dark-grey leading-none">×</button>
+                      <button onClick={() => setSelectedStudent(null)} className="text-2xl text-mid-grey dark:text-gray-400 hover:text-dark-grey dark:hover:text-gray-200 leading-none">×</button>
                     </div>
                     <div className="p-5 space-y-5">
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         {[["Father's Name", selectedStudent.fatherName], ["Mother's Name", selectedStudent.motherName], ["Phone", selectedStudent.phone], ["Admission", new Date(selectedStudent.admissionDate).toLocaleDateString('en-IN')], ["Monthly Fee", `₹${selectedStudent.monthlyFeeOverride || FEE_STRUCTURE[selectedStudent.studentClass] || 0}`], ["Discount", selectedStudent.discount > 0 ? `₹${selectedStudent.discount}/month` : 'None']].map(([k, v]) => (
-                          <div key={k} className="bg-gray-50 rounded-xl p-3"><p className="text-xs text-mid-grey">{k}</p><p className="font-semibold text-dark-grey">{v || 'N/A'}</p></div>
+                          <div key={k} className="bg-gray-50 dark:bg-slate-800 rounded-xl p-3"><p className="text-xs text-mid-grey dark:text-gray-400">{k}</p><p className="font-semibold text-dark-grey dark:text-gray-100">{v || 'N/A'}</p></div>
                         ))}
                       </div>
                       <div className="flex gap-2 flex-wrap">
@@ -670,7 +670,7 @@ export default function AdminDashboard() {
                         <button onClick={() => { setDiscountModal(selectedStudent); setDiscountForm({ discount: selectedStudent.discount || 0, discountStartMonth: selectedStudent.discountStartMonth || '' }); setSelectedStudent(null); }} className="btn-outline text-sm px-3 py-2">🏷️ Give Discount</button>
                         <button onClick={() => { setEditStudent(selectedStudent); setSelectedStudent(null); }} className="btn-outline text-sm px-3 py-2">✏️ Edit</button>
                       </div>
-                      <h4 className="font-semibold text-dark-grey">Fee Status</h4>
+                      <h4 className="font-semibold text-dark-grey dark:text-gray-100">Fee Status</h4>
                       <FeeTable student={selectedStudent} feeStatus={studentFeeData || []} showPayButton={false} />
                     </div>
                   </div>
@@ -685,7 +685,7 @@ export default function AdminDashboard() {
                     <option value="">All Classes</option>
                     {CLASSES.map(c => <option key={c} value={c}>Class {c}</option>)}
                   </select>
-                  <label className="flex items-center gap-1.5 text-sm text-mid-grey cursor-pointer">
+                  <label className="flex items-center gap-1.5 text-sm text-mid-grey dark:text-gray-400 cursor-pointer">
                     <input type="checkbox" checked={showArchived} onChange={e => setShowArchived(e.target.checked)} />
                     Archived
                   </label>
@@ -694,18 +694,18 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="overflow-x-auto rounded-xl border border-gray-100">
+              <div className="overflow-x-auto rounded-xl border border-gray-100 dark:border-slate-800">
                 <table className="w-full min-w-[700px]">
                   <thead>
                     <tr>{['Roll No', 'Name', 'Class', 'Father', 'Phone', 'Status', 'Actions'].map(h=><th key={h} className="table-th">{h}</th>)}</tr>
                   </thead>
                   <tbody>
                     {students.map(s => (
-                      <tr key={s._id} className="hover:bg-gray-50 cursor-pointer" onClick={() => openStudentDetail(s)}>
+                      <tr key={s._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/60 cursor-pointer" onClick={() => openStudentDetail(s)}>
                         <td className="table-td font-mono text-xs">{s.rollNumber}</td>
                         <td className="table-td font-medium">{s.name}</td>
                         <td className="table-td"><span className="badge-green">Cls {s.studentClass}-{s.section}</span></td>
-                        <td className="table-td text-sm text-mid-grey">{s.fatherName || 'N/A'}</td>
+                        <td className="table-td text-sm text-mid-grey dark:text-gray-400">{s.fatherName || 'N/A'}</td>
                         <td className="table-td text-sm">{s.phone || 'N/A'}</td>
                         <td className="table-td">{s.isArchived ? <span className="badge-red">Archived</span> : <span className="badge-green">Active</span>}</td>
                         <td className="table-td" onClick={e => e.stopPropagation()}>
@@ -717,13 +717,13 @@ export default function AdminDashboard() {
                         </td>
                       </tr>
                     ))}
-                    {students.length === 0 && <tr><td colSpan={7} className="table-td text-center text-mid-grey py-8">No students found.</td></tr>}
+                    {students.length === 0 && <tr><td colSpan={7} className="table-td text-center text-mid-grey dark:text-gray-400 py-8">No students found.</td></tr>}
                   </tbody>
                 </table>
               </div>
               {/* Pagination */}
               <div className="flex justify-between items-center mt-4">
-                <p className="text-sm text-mid-grey">Showing {students.length} of {studentTotal}</p>
+                <p className="text-sm text-mid-grey dark:text-gray-400">Showing {students.length} of {studentTotal}</p>
                 <div className="flex gap-2">
                   <button onClick={() => loadStudents(studentPage - 1)} disabled={studentPage <= 1} className="btn-outline text-sm px-4 py-1.5 disabled:opacity-40">← Prev</button>
                   <button onClick={() => loadStudents(studentPage + 1)} disabled={students.length < 20} className="btn-outline text-sm px-4 py-1.5 disabled:opacity-40">Next →</button>
@@ -741,13 +741,13 @@ export default function AdminDashboard() {
               </div>
               {selectedTeacherDetail && (
                 <div className="fixed inset-0 bg-black/40 z-50 flex justify-end">
-                  <div className="w-full max-w-lg bg-white h-full overflow-y-auto shadow-xl animate-slide-up">
-                    <div className="flex items-center justify-between p-5 border-b border-gray-100 sticky top-0 bg-white z-10">
+                  <div className="w-full max-w-lg bg-white dark:bg-slate-900 h-full overflow-y-auto shadow-xl dark:shadow-black/50 animate-slide-up">
+                    <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-slate-800 sticky top-0 bg-white dark:bg-slate-900 z-10">
                       <div>
-                        <h3 className="font-bold text-dark-grey">{selectedTeacherDetail.name}</h3>
-                        <p className="text-sm text-mid-grey">{selectedTeacherDetail.username}</p>
+                        <h3 className="font-bold text-dark-grey dark:text-gray-100">{selectedTeacherDetail.name}</h3>
+                        <p className="text-sm text-mid-grey dark:text-gray-400">{selectedTeacherDetail.username}</p>
                       </div>
-                      <button onClick={() => setSelectedTeacherDetail(null)} className="text-2xl text-mid-grey hover:text-dark-grey leading-none">×</button>
+                      <button onClick={() => setSelectedTeacherDetail(null)} className="text-2xl text-mid-grey dark:text-gray-400 hover:text-dark-grey dark:hover:text-gray-200 leading-none">×</button>
                     </div>
                     <div className="p-5 space-y-5">
                       {selectedTeacherDetail.email && <p className="text-sm">✉️ {selectedTeacherDetail.email}</p>}
@@ -761,21 +761,21 @@ export default function AdminDashboard() {
                 {teachers.map(t => (
                   <div key={t._id} className="card hover:shadow-card transition-all cursor-pointer" onClick={() => setSelectedTeacherDetail(t)}>
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-12 h-12 rounded-2xl bg-pastel-peach/50 flex items-center justify-center text-xl font-bold text-dark-grey">{t.name[0]}</div>
+                      <div className="w-12 h-12 rounded-2xl bg-pastel-peach/50 dark:bg-pastel-peach/20 flex items-center justify-center text-xl font-bold text-dark-grey dark:text-gray-100">{t.name[0]}</div>
                       <div>
-                        <p className="font-semibold text-dark-grey">{t.name}</p>
-                        <p className="text-sm text-mid-grey">{t.username}</p>
+                        <p className="font-semibold text-dark-grey dark:text-gray-100">{t.name}</p>
+                        <p className="text-sm text-mid-grey dark:text-gray-400">{t.username}</p>
                       </div>
                     </div>
-                    {t.phone && <p className="text-sm text-mid-grey mb-1">📞 {t.phone}</p>}
-                    {t.email && <p className="text-sm text-mid-grey mb-3">✉️ {t.email}</p>}
+                    {t.phone && <p className="text-sm text-mid-grey dark:text-gray-400 mb-1">📞 {t.phone}</p>}
+                    {t.email && <p className="text-sm text-mid-grey dark:text-gray-400 mb-3">✉️ {t.email}</p>}
                     <div className="flex gap-2 mt-2">
                       <button onClick={e => { e.stopPropagation(); setEditTeacher(t); }} className="btn-outline text-xs px-3 py-1.5 flex-1">Edit</button>
                       <button onClick={e => { e.stopPropagation(); deleteTeacher(t._id); }} className="btn-danger text-xs px-3 py-1.5 flex-1">Delete</button>
                     </div>
                   </div>
                 ))}
-                {teachers.length === 0 && <div className="col-span-3 text-center py-12 text-mid-grey">No teachers yet. Add one!</div>}
+                {teachers.length === 0 && <div className="col-span-3 text-center py-12 text-mid-grey dark:text-gray-400">No teachers yet. Add one!</div>}
               </div>
             </div>
           )}
@@ -794,32 +794,32 @@ export default function AdminDashboard() {
                   </select>
                 </div>
               </div>
-              <div className="overflow-x-auto rounded-xl border border-gray-100">
+              <div className="overflow-x-auto rounded-xl border border-gray-100 dark:border-slate-800">
                 <table className="w-full min-w-[700px]">
                   <thead>
                     <tr>{['Student', 'Class', 'Month', 'Amount', 'Type', 'Date', 'Slip/TxnID'].map(h=><th key={h} className="table-th">{h}</th>)}</tr>
                   </thead>
                   <tbody>
                     {payments.map(p => (
-                      <tr key={p._id} className="hover:bg-gray-50">
+                      <tr key={p._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/60">
                         <td className="table-td">
                           <p className="font-medium">{p.studentId?.name}</p>
-                          <p className="text-xs text-mid-grey font-mono">{p.studentId?.rollNumber}</p>
+                          <p className="text-xs text-mid-grey dark:text-gray-400 font-mono">{p.studentId?.rollNumber}</p>
                         </td>
                         <td className="table-td"><span className="badge-green">Cls {p.studentId?.studentClass}</span></td>
                         <td className="table-td text-sm">{MONTH_NAMES[(p.month||1)-1].slice(0,3)} {p.year}</td>
                         <td className="table-td font-bold">₹{p.amount}</td>
                         <td className="table-td"><span className={p.type === 'online' ? 'badge-blue' : 'badge-yellow'}>{p.type}</span></td>
-                        <td className="table-td text-xs text-mid-grey">{new Date(p.paidAt).toLocaleDateString('en-IN')}</td>
-                        <td className="table-td text-xs font-mono text-mid-grey">{p.slipNumber || p.razorpayPaymentId?.slice(-8) || 'N/A'}</td>
+                        <td className="table-td text-xs text-mid-grey dark:text-gray-400">{new Date(p.paidAt).toLocaleDateString('en-IN')}</td>
+                        <td className="table-td text-xs font-mono text-mid-grey dark:text-gray-400">{p.slipNumber || p.razorpayPaymentId?.slice(-8) || 'N/A'}</td>
                       </tr>
                     ))}
-                    {payments.length === 0 && <tr><td colSpan={7} className="table-td text-center text-mid-grey py-8">No payments found.</td></tr>}
+                    {payments.length === 0 && <tr><td colSpan={7} className="table-td text-center text-mid-grey dark:text-gray-400 py-8">No payments found.</td></tr>}
                   </tbody>
                 </table>
               </div>
               <div className="flex justify-between items-center mt-4">
-                <p className="text-sm text-mid-grey">Showing {payments.length} of {paymentTotal}</p>
+                <p className="text-sm text-mid-grey dark:text-gray-400">Showing {payments.length} of {paymentTotal}</p>
                 <div className="flex gap-2">
                   <button onClick={() => loadPayments(paymentPage - 1)} disabled={paymentPage <= 1} className="btn-outline text-sm px-4 py-1.5 disabled:opacity-40">← Prev</button>
                   <button onClick={() => loadPayments(paymentPage + 1)} disabled={payments.length < 20} className="btn-outline text-sm px-4 py-1.5 disabled:opacity-40">Next →</button>
@@ -834,26 +834,26 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between mb-5">
                 <h3 className="section-title text-xl">Enquiries ({enquiries.length})</h3>
               </div>
-              <div className="overflow-x-auto rounded-xl border border-gray-100">
+              <div className="overflow-x-auto rounded-xl border border-gray-100 dark:border-slate-800">
                 <table className="w-full min-w-[800px]">
                   <thead>
                     <tr>{['Status', 'Date', 'Name', 'Contact', 'Message', 'Actions'].map(h=><th key={h} className="table-th">{h}</th>)}</tr>
                   </thead>
                   <tbody>
                     {enquiries.map(e => (
-                      <tr key={e._id} className={e.status === 'Unread' ? 'bg-blue-50/30 font-semibold' : 'hover:bg-gray-50'}>
+                      <tr key={e._id} className={e.status === 'Unread' ? 'bg-blue-50/30 dark:bg-blue-950/20 font-semibold' : 'hover:bg-gray-50 dark:hover:bg-slate-800/60'}>
                         <td className="table-td">
                           {e.status === 'Unread' && <span className="badge-red">Unread</span>}
                           {e.status === 'Read' && <span className="badge-blue">Read</span>}
                           {e.status === 'Resolved' && <span className="badge-green">Resolved</span>}
                         </td>
-                        <td className="table-td text-xs text-mid-grey">
+                        <td className="table-td text-xs text-mid-grey dark:text-gray-400">
                           {new Date(e.createdAt).toLocaleString('en-IN', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})}
                         </td>
                         <td className="table-td">{e.name}</td>
                         <td className="table-td text-xs">
                           {e.email}<br/>
-                          <span className="text-mid-grey">{e.phone || 'No phone'}</span>
+                          <span className="text-mid-grey dark:text-gray-400">{e.phone || 'No phone'}</span>
                         </td>
                         <td className="table-td text-sm min-w-[250px] whitespace-normal">
                           {e.message}
@@ -891,25 +891,25 @@ export default function AdminDashboard() {
                   <div key={f._id} className="card flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-semibold text-dark-grey">{f.name || 'Anonymous'}</span>
+                        <span className="font-semibold text-dark-grey dark:text-gray-100">{f.name || 'Anonymous'}</span>
                         <div className="flex text-yellow-500">
                           {Array.from({length: 5}).map((_, i) => (
                             <span key={i} className={i < f.rating ? 'opacity-100' : 'opacity-30'}>★</span>
                           ))}
                         </div>
                       </div>
-                      <p className="text-mid-grey text-sm mb-4 line-clamp-4">{f.message}</p>
+                      <p className="text-mid-grey dark:text-gray-400 text-sm mb-4 line-clamp-4">{f.message}</p>
                     </div>
-                    <div className="flex items-center gap-2 pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-2 pt-4 border-t border-gray-100 dark:border-slate-800">
                       <button 
                         onClick={() => toggleFeedbackApproval(f._id, f.isApproved)} 
-                        className={`text-xs px-3 py-1.5 rounded-full flex-1 ${f.isApproved ? 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100' : 'bg-green-50 text-green-600 border border-green-200 hover:bg-green-100'}`}
+                        className={`text-xs px-3 py-1.5 rounded-full flex-1 ${f.isApproved ? 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40' : 'bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 dark:bg-green-950/40 dark:text-green-400 dark:border-green-900/50 dark:hover:bg-green-900/40'}`}
                       >
                         {f.isApproved ? 'Revoke Approval' : 'Approve Publicly'}
                       </button>
                       <button 
                         onClick={() => deleteFeedback(f._id)}
-                        className="text-xs px-3 py-1.5 rounded-full text-gray-500 border border-gray-200 hover:bg-gray-100"
+                        className="text-xs px-3 py-1.5 rounded-full text-gray-500 border border-gray-200 hover:bg-gray-100 dark:text-gray-400 dark:border-slate-700 dark:hover:bg-slate-800"
                       >
                         Delete
                       </button>
@@ -917,7 +917,7 @@ export default function AdminDashboard() {
                   </div>
                 ))}
                 {feedbacks.length === 0 && (
-                  <div className="col-span-full text-center py-10 text-mid-grey border border-dashed border-gray-200 rounded-xl">
+                  <div className="col-span-full text-center py-10 text-mid-grey dark:text-gray-400 border border-dashed border-gray-200 dark:border-slate-700 rounded-xl">
                     No feedback received yet.
                   </div>
                 )}
@@ -961,8 +961,8 @@ export default function AdminDashboard() {
           <div className="modal-box max-w-sm">
             <div className="p-6 text-center">
               <div className="text-5xl mb-4">⚠️</div>
-              <h3 className="text-xl font-bold text-dark-grey mb-2">Delete Student?</h3>
-              <p className="text-mid-grey text-sm mb-6">This action cannot be undone. All related data including user account and sessions will be removed permanently.</p>
+              <h3 className="text-xl font-bold text-dark-grey dark:text-gray-100 mb-2">Delete Student?</h3>
+              <p className="text-mid-grey dark:text-gray-400 text-sm mb-6">This action cannot be undone. All related data including user account and sessions will be removed permanently.</p>
               <div className="flex gap-3">
                 <button onClick={() => setDeleteConfirm(null)} className="btn-outline flex-1">Cancel</button>
                 <button onClick={deleteStudent} className="btn-danger flex-1">Yes, Delete</button>
@@ -983,11 +983,11 @@ export default function AdminDashboard() {
           <div className="modal-box max-w-sm">
             <div className="p-6 text-center">
               <div className="text-5xl mb-4">🎉</div>
-              <h3 className="text-xl font-bold text-dark-grey mb-2">Student Added!</h3>
-              <p className="text-mid-grey text-sm mb-5">Share these login credentials with the student/parent:</p>
-              <div className="bg-pastel-green/20 rounded-xl p-4 space-y-2 text-left mb-5">
-                <div className="flex justify-between"><span className="text-sm text-mid-grey">Username (Roll No)</span><span className="font-mono font-bold text-dark-grey">{credsModal.username}</span></div>
-                <div className="flex justify-between"><span className="text-sm text-mid-grey">Password</span><span className="font-mono font-bold text-dark-grey">{credsModal.password}</span></div>
+              <h3 className="text-xl font-bold text-dark-grey dark:text-gray-100 mb-2">Student Added!</h3>
+              <p className="text-mid-grey dark:text-gray-400 text-sm mb-5">Share these login credentials with the student/parent:</p>
+              <div className="bg-pastel-green/20 dark:bg-pastel-green/10 rounded-xl p-4 space-y-2 text-left mb-5">
+                <div className="flex justify-between"><span className="text-sm text-mid-grey dark:text-gray-400">Username (Roll No)</span><span className="font-mono font-bold text-dark-grey dark:text-gray-100">{credsModal.username}</span></div>
+                <div className="flex justify-between"><span className="text-sm text-mid-grey dark:text-gray-400">Password</span><span className="font-mono font-bold text-dark-grey dark:text-gray-100">{credsModal.password}</span></div>
               </div>
               <p className="text-xs text-orange-600 mb-5">⚠️ The student should change their password after first login.</p>
               <button onClick={() => setCredsModal(null)} className="btn-primary w-full">Done</button>
@@ -1000,14 +1000,14 @@ export default function AdminDashboard() {
       {offlineModal && (
         <div className="modal-overlay">
           <div className="modal-box max-w-sm">
-            <div className="flex items-center justify-between p-5 border-b border-gray-100">
-              <h3 className="font-bold text-dark-grey">Mark Offline Payment</h3>
-              <button onClick={() => setOfflineModal(null)} className="text-2xl text-mid-grey">×</button>
+            <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-slate-800">
+              <h3 className="font-bold text-dark-grey dark:text-gray-100">Mark Offline Payment</h3>
+              <button onClick={() => setOfflineModal(null)} className="text-2xl text-mid-grey dark:text-gray-400">×</button>
             </div>
             <form onSubmit={markOffline} className="p-5 space-y-4">
-              <div className="bg-pastel-green/20 rounded-xl p-3">
-                <p className="font-medium text-dark-grey">{offlineModal.name}</p>
-                <p className="text-sm text-mid-grey">Roll: {offlineModal.rollNumber}</p>
+              <div className="bg-pastel-green/20 dark:bg-pastel-green/10 rounded-xl p-3">
+                <p className="font-medium text-dark-grey dark:text-gray-100">{offlineModal.name}</p>
+                <p className="text-sm text-mid-grey dark:text-gray-400">Roll: {offlineModal.rollNumber}</p>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="label">Month</label>
@@ -1033,20 +1033,20 @@ export default function AdminDashboard() {
       {discountModal && (
         <div className="modal-overlay">
           <div className="modal-box max-w-sm">
-            <div className="flex items-center justify-between p-5 border-b border-gray-100">
-              <h3 className="font-bold text-dark-grey">Give Discount</h3>
-              <button onClick={() => setDiscountModal(null)} className="text-2xl text-mid-grey">×</button>
+            <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-slate-800">
+              <h3 className="font-bold text-dark-grey dark:text-gray-100">Give Discount</h3>
+              <button onClick={() => setDiscountModal(null)} className="text-2xl text-mid-grey dark:text-gray-400">×</button>
             </div>
             <form onSubmit={saveDiscount} className="p-5 space-y-4">
-              <div className="bg-pastel-green/20 rounded-xl p-3">
-                <p className="font-medium text-dark-grey">{discountModal.name}</p>
-                <p className="text-sm text-mid-grey">Class {discountModal.studentClass} · Default Fee: ₹{FEE_STRUCTURE[discountModal.studentClass]}</p>
+              <div className="bg-pastel-green/20 dark:bg-pastel-green/10 rounded-xl p-3">
+                <p className="font-medium text-dark-grey dark:text-gray-100">{discountModal.name}</p>
+                <p className="text-sm text-mid-grey dark:text-gray-400">Class {discountModal.studentClass} · Default Fee: ₹{FEE_STRUCTURE[discountModal.studentClass]}</p>
               </div>
               <div><label className="label">Discount Amount (₹/month)</label>
                 <input type="number" className="input" min="0" value={discountForm.discount} onChange={e => setDiscountForm(f => ({ ...f, discount: +e.target.value }))} required /></div>
               <div><label className="label">Effective From (YYYY-MM)</label>
                 <input type="month" className="input" value={discountForm.discountStartMonth} onChange={e => setDiscountForm(f => ({ ...f, discountStartMonth: e.target.value }))} /></div>
-              <p className="text-xs text-mid-grey bg-blue-50 p-3 rounded-xl">Discount applies from the selected month onwards to current and future months only.</p>
+              <p className="text-xs text-mid-grey dark:text-gray-400 bg-blue-50 dark:bg-blue-950/30 p-3 rounded-xl">Discount applies from the selected month onwards to current and future months only.</p>
               <div className="flex gap-3">
                 <button type="button" onClick={() => setDiscountModal(null)} className="btn-outline flex-1">Cancel</button>
                 <button type="submit" className="btn-primary flex-1">Save Discount</button>

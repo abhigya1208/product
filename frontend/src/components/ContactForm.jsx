@@ -21,14 +21,14 @@ export default function ContactForm() {
   };
 
   return (
-    <section id="contact" className="py-20 bg-white">
+    <section id="contact" className="py-20 bg-white dark:bg-gray-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-14 items-start">
           {/* Left info */}
           <div>
-            <span className="inline-block bg-pastel-green/50 text-dark-grey text-sm font-semibold px-4 py-1.5 rounded-full mb-4">Get In Touch</span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-dark-grey mb-5">Contact Us</h2>
-            <p className="text-mid-grey mb-8">Have a question or want to enrol your child? We'd love to hear from you. Fill in the form and we'll get back to you shortly.</p>
+            <span className="inline-block bg-pastel-green/50 dark:bg-green-950/30 text-dark-grey dark:text-green-300 text-sm font-semibold px-4 py-1.5 rounded-full mb-4">Get In Touch</span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-dark-grey dark:text-white mb-5">Contact Us</h2>
+            <p className="text-mid-grey dark:text-gray-400 mb-8">Have a question or want to enrol your child? We'd love to hear from you. Fill in the form and we'll get back to you shortly.</p>
             <div className="flex flex-col gap-5">
               {[
                 { icon: '📍', title: 'Address', value: 'A-353, Gali No 8, Part 2, Pusta 1, Sonia Vihar, Delhi' },
@@ -39,16 +39,16 @@ export default function ContactForm() {
                 <div key={i} className="flex items-start gap-4">
                   <div className="text-2xl w-10 flex-shrink-0">{item.icon}</div>
                   <div>
-                    <p className="font-semibold text-dark-grey text-sm">{item.title}</p>
-                    <p className="text-mid-grey text-sm">{item.value}</p>
+                    <p className="font-semibold text-dark-grey dark:text-gray-100 text-sm">{item.title}</p>
+                    <p className="text-mid-grey dark:text-gray-400 text-sm">{item.value}</p>
                   </div>
                 </div>
               ))}
             </div>
 
             {/* Social Links */}
-            <div className="mt-10 pt-8 border-t border-gray-100">
-              <p className="font-bold text-dark-grey mb-4 text-sm uppercase tracking-wide">Connect With Us</p>
+            <div className="mt-10 pt-8 border-t border-gray-100 dark:border-slate-800">
+              <p className="font-bold text-dark-grey dark:text-white mb-4 text-sm uppercase tracking-wide">Connect With Us</p>
               <div className="flex flex-wrap gap-4">
                 <a href="https://wa.me/919839910481" target="_blank" rel="noopener noreferrer"
                   className="flex items-center gap-2 bg-[#25D366] text-white px-5 py-2.5 rounded-xl font-semibold hover:scale-105 transition-all shadow-sm">
@@ -67,8 +67,8 @@ export default function ContactForm() {
             {status === 'success' ? (
               <div className="py-8 text-center">
                 <div className="text-5xl mb-4">🎉</div>
-                <h3 className="text-xl font-bold text-dark-grey mb-2">Message Sent!</h3>
-                <p className="text-mid-grey mb-6">Thank you for reaching out. We'll contact you within 24 hours.</p>
+                <h3 className="text-xl font-bold text-dark-grey dark:text-white mb-2">Message Sent!</h3>
+                <p className="text-mid-grey dark:text-gray-400 mb-6">Thank you for reaching out. We'll contact you within 24 hours.</p>
                 <button onClick={() => setStatus('idle')} className="btn-primary">Send Another</button>
               </div>
             ) : (

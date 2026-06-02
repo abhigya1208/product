@@ -40,7 +40,7 @@ export default function HeroSection() {
   return (
     <section id="home" className="relative min-h-screen flex items-center overflow-hidden">
       {/* Background gradient blobs */}
-      <div className="absolute inset-0 bg-gradient-to-br from-pastel-green/30 via-cream to-pastel-peach/30" />
+      <div className="absolute inset-0 bg-gradient-to-br from-pastel-green/30 via-cream to-pastel-peach/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950" />
       <div className="absolute top-20 right-10 w-72 h-72 bg-pastel-green/20 rounded-full blur-3xl" />
       <div className="absolute bottom-20 left-10 w-64 h-64 bg-pastel-peach/30 rounded-full blur-3xl" />
 
@@ -48,21 +48,21 @@ export default function HeroSection() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left — text */}
           <div className="animate-fade-in">
-            <div className="inline-flex items-center gap-2 bg-pastel-green/40 rounded-full px-4 py-1.5 mb-6">
+            <div className="inline-flex items-center gap-2 bg-pastel-green/40 dark:bg-green-950/20 rounded-full px-4 py-1.5 mb-6">
               <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-              <span className="text-sm font-medium text-dark-grey">Admissions Open 2026–27</span>
+              <span className="text-sm font-medium text-dark-grey dark:text-gray-200">Admissions Open 2026–27</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-dark-grey leading-tight mb-6">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-dark-grey dark:text-white leading-tight mb-6">
               Carving Future –<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-500">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-500 dark:from-green-400 dark:to-teal-400">
                 One Student
               </span>{' '}
               at a Time
             </h1>
-            <p className="text-lg text-mid-grey mb-8 max-w-md">
+            <p className="text-lg text-mid-grey dark:text-gray-400 mb-8 max-w-md">
               AGS Tutorial provides quality education from Nursery to Class 12 in a nurturing, caring environment. 
-              <span className="block mt-2 font-semibold text-green-600">100% passing result for board students since opening (2022)</span>
-              <span className="block mt-1 text-sm italic text-mid-grey">Every student has passed since the tuition opened in 2022.</span>
+              <span className="block mt-2 font-semibold text-green-600 dark:text-green-400">100% passing result for board students since opening (2022)</span>
+              <span className="block mt-1 text-sm italic text-mid-grey dark:text-gray-400">Every student has passed since the tuition opened in 2022.</span>
             </p>
             <div className="flex flex-wrap gap-4">
               <button id="hero-enroll-btn" onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
@@ -79,20 +79,20 @@ export default function HeroSection() {
           {/* Right — logo + card */}
           <div className="flex flex-col items-center animate-fade-in">
             <div className="relative">
-              <div className="w-56 h-56 bg-white rounded-3xl shadow-card flex items-center justify-center border-4 border-pastel-green/40">
+              <div className="w-56 h-56 bg-white dark:bg-slate-900 rounded-3xl shadow-card dark:shadow-none flex items-center justify-center border-4 border-pastel-green/40 dark:border-pastel-green/20">
                 <img src="/logo.png" alt="AGS Tutorial" className="w-44 h-44 object-contain" />
               </div>
-              <div className="absolute -bottom-4 -right-4 bg-pastel-peach rounded-2xl px-4 py-2 shadow-card">
-                <p className="text-xs font-semibold text-dark-grey">Est. 2022</p>
+              <div className="absolute -bottom-4 -right-4 bg-pastel-peach dark:bg-orange-950/40 rounded-2xl px-4 py-2 shadow-card dark:shadow-none">
+                <p className="text-xs font-semibold text-dark-grey dark:text-gray-200">Est. 2022</p>
               </div>
-              <div className="absolute -top-4 -left-4 bg-white rounded-2xl px-4 py-2 shadow-card">
-                <p className="text-xs font-semibold text-green-600">✓ Trusted by 500+ Families</p>
+              <div className="absolute -top-4 -left-4 bg-white dark:bg-slate-800 rounded-2xl px-4 py-2 shadow-card dark:shadow-none">
+                <p className="text-xs font-semibold text-green-600 dark:text-green-400">✓ Trusted by 500+ Families</p>
               </div>
             </div>
             {/* 24/7 CCTV Surveillance badge shifted just below the logo */}
-            <div className="mt-4 bg-white rounded-2xl px-4 py-2 shadow-card flex items-center gap-2 border border-pastel-green/20 animate-bounce" style={{ animationDuration: '3s' }}>
+            <div className="mt-4 bg-white dark:bg-slate-900 rounded-2xl px-4 py-2 shadow-card dark:shadow-none flex items-center gap-2 border border-pastel-green/20 dark:border-slate-850 animate-bounce" style={{ animationDuration: '3s' }}>
               <span className="text-red-500 animate-pulse">●</span>
-              <p className="text-xs font-semibold text-dark-grey">24/7 CCTV Surveillance</p>
+              <p className="text-xs font-semibold text-dark-grey dark:text-gray-200">24/7 CCTV Surveillance</p>
             </div>
           </div>
         </div>
@@ -101,10 +101,10 @@ export default function HeroSection() {
         <div className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-6">
           {stats.map((s, i) => (
             <div key={i} className="card text-center hover:shadow-card transition-all hover:-translate-y-1">
-              <p className="text-3xl font-extrabold text-dark-grey mb-1">
+              <p className="text-3xl font-extrabold text-dark-grey dark:text-white mb-1">
                 <Counter target={s.value} suffix={s.suffix} />
               </p>
-              <p className="text-sm text-mid-grey font-medium">{s.label}</p>
+              <p className="text-sm text-mid-grey dark:text-gray-400 font-medium">{s.label}</p>
             </div>
           ))}
         </div>

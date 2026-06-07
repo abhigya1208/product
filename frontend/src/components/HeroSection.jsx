@@ -73,6 +73,10 @@ export default function HeroSection() {
                 className="btn-outline text-base px-8 py-3">
                 Login Portal
               </button>
+              <button id="hero-gallery-btn" onClick={() => navigate('/gallery')}
+                className="btn-outline text-base px-8 py-3 border-pastel-peach hover:bg-pastel-peach hover:text-dark-grey">
+                📸 Gallery
+              </button>
             </div>
           </div>
 

@@ -46,6 +46,7 @@ export default function Navbar() {
             <Link to="/about" className="text-dark-grey dark:text-gray-300 hover:text-pastel-green-dark dark:hover:text-pastel-green font-medium transition-colors">About Us</Link>
             <Link to="/admissions" className="text-dark-grey dark:text-gray-300 hover:text-pastel-green-dark dark:hover:text-pastel-green font-medium transition-colors">Admissions</Link>
             <Link to="/academics" className="text-dark-grey dark:text-gray-300 hover:text-pastel-green-dark dark:hover:text-pastel-green font-medium transition-colors">Academics</Link>
+            <Link to="/gallery" className="text-dark-grey dark:text-gray-300 hover:text-pastel-green-dark dark:hover:text-pastel-green font-medium transition-colors">Gallery</Link>
             <Link to="/contact" className="text-dark-grey dark:text-gray-300 hover:text-pastel-green-dark dark:hover:text-pastel-green font-medium transition-colors">Contact Us</Link>
 
             {/* Theme Toggle */}
@@ -94,6 +95,7 @@ export default function Navbar() {
               { path: '/about', label: 'About Us' },
               { path: '/admissions', label: 'Admissions' },
               { path: '/academics', label: 'Academics' },
+              { path: '/gallery', label: 'Gallery' },
               { path: '/contact', label: 'Contact Us' }
             ].map(link => (
               <Link key={link.path} to={link.path} onClick={() => setMenuOpen(false)}

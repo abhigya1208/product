@@ -22,12 +22,14 @@ import SalaryLedgerDrawer from '../components/SalaryLedgerDrawer';
 import SalaryAssignmentModal from '../components/SalaryAssignmentModal';
 import ThemeToggler from '../components/ThemeToggler';
 import ErrorBoundary from '../components/ErrorBoundary';
+import GalleryPanel from '../components/GalleryPanel';
 const NAV = [
   { id: 'dashboard', label: 'Dashboard', icon: '📊' },
   { id: 'students',  label: 'Students',  icon: '👨‍🎓' },
   { id: 'teachers',  label: 'Teachers',  icon: '👩‍🏫' },
   { id: 'salaries',  label: 'Salaries',  icon: '💰' },
   { id: 'support_chat', label: 'Support Chats', icon: '💬' },
+  { id: 'gallery', label: 'Gallery', icon: '🖼️' },
   { id: 'settings', label: 'Settings', icon: '⚙️' },
 ];
 
@@ -928,6 +930,7 @@ export default function AdminDashboard() {
           {tab === 'sessions' && <SessionManager />}
           {tab === 'logs' && <LogViewer />}
           {tab === 'support_chat' && <SupportChatsPanel />}
+          {tab === 'gallery' && <GalleryPanel />}
           {/* SettingsPanel rendered within Settings page */}
         </main>
       </div>

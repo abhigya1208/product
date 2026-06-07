@@ -67,6 +67,14 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// root route
+app.get("/", (req, res) => {
+  res.json({
+    status: "success",
+    message: "AGS Tutorial Backend Live 🚀",
+  });
+});
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found.' });

@@ -10,6 +10,7 @@ import AboutUsPage from './pages/AboutUsPage';
 import ContactUsPage from './pages/ContactUsPage';
 import AdmissionsPage from './pages/AdmissionsPage';
 import AcademicsPage from './pages/AcademicsPage';
+import GalleryPage from './pages/GalleryPage';
 import FloatingChat from './components/FloatingChat';
 
 function ProtectedRoute({ children, roles }) {
@@ -29,6 +30,7 @@ export default function App() {
         <Route path="/contact" element={<ContactUsPage />} />
         <Route path="/admissions" element={<AdmissionsPage />} />
         <Route path="/academics" element={<AcademicsPage />} />
+        <Route path="/gallery" element={<GalleryPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/privacy" element={<PrivacyInfo />} />
         <Route path="/admin/*" element={

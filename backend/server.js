@@ -19,6 +19,7 @@ const contactRoutes = require('./routes/contactRoutes');
 const logRoutes = require('./routes/logRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
 const aiRoutes = require('./routes/aiRoutes');
+const galleryRoutes = require('./routes/galleryRoutes');
 
 const app = express();
 const server = http.createServer(app);
@@ -43,7 +44,7 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   credentials: true
 }));
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '1100mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
@@ -59,6 +60,7 @@ app.use('/api/contact', contactRoutes);
 app.use('/api/logs', logRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/gallery', galleryRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

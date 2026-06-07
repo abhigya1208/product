@@ -1,7 +1,4 @@
 import Navbar from '../components/Navbar';
- import HeroSection from '../components/HeroSection';
- import WhyChooseUs from '../components/WhyChooseUs';
- import AboutUs from '../components/AboutUs';
 import HeroSection from '../components/HeroSection';
 import WhyChooseUs from '../components/WhyChooseUs';
 import AboutUs from '../components/AboutUs';

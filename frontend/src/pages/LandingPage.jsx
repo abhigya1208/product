@@ -22,17 +22,16 @@ export default function LandingPage() {
             We believe in providing quality education that is accessible to everyone. Here is a glimpse of our competitive fee structure.
           </p>
           
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-10">
-            {['NUR', '1', '5', '9', '10'].map((cls) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4 mb-10">
+            {['NUR', 'LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'].map((cls) => (
               <div key={cls} className="p-6 rounded-2xl bg-cream dark:bg-slate-900 border border-gray-100 dark:border-slate-800 shadow-soft dark:shadow-none flex flex-col justify-center">
                 <p className="text-xs font-bold text-mid-grey dark:text-gray-400 uppercase mb-1">Class {cls}</p>
                 <p className="text-2xl font-extrabold text-dark-grey dark:text-white">₹{FEE_STRUCTURE[cls]}</p>
               </div>
             ))}
-            <div className="p-6 rounded-2xl bg-pastel-peach/20 dark:bg-orange-950/10 border border-pastel-peach/30 dark:border-orange-900/30 shadow-soft dark:shadow-none col-span-2 md:col-span-1 lg:col-span-1 flex flex-col justify-center">
+            <div className="p-6 rounded-2xl bg-pastel-peach/20 dark:bg-orange-950/10 border border-pastel-peach/30 dark:border-orange-900/30 shadow-soft dark:shadow-none flex flex-col justify-center">
               <p className="text-xs font-bold text-mid-grey dark:text-gray-400 uppercase mb-1">Class 11 & 12</p>
               <p className="text-2xl font-extrabold text-dark-grey dark:text-white">₹400 – ₹1200</p>
-              <p className="text-[10px] font-bold text-mid-grey dark:text-gray-400 uppercase mt-1">Contact to branch</p>
             </div>
           </div>
           

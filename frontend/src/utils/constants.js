@@ -34,5 +34,25 @@ export const MONTH_NAMES = [
 
 export const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-export const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+// Clean up and resolve API URL resiliently
+let resolvedApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+if (resolvedApiUrl && !resolvedApiUrl.endsWith('/api') && !resolvedApiUrl.endsWith('/api/')) {
+  resolvedApiUrl = resolvedApiUrl.endsWith('/') ? `${resolvedApiUrl}api` : `${resolvedApiUrl}/api`;
+}
+export const API_URL = resolvedApiUrl;
+
+// Extract origin for Socket fallback
+let fallbackSocket = 'http://localhost:5000';
+try {
+  const urlObj = new URL(API_URL);
+  fallbackSocket = urlObj.origin;
+} catch (e) {
+  // Ignore parsing errors
+}
+
+// Clean up and resolve Socket URL resiliently
+let resolvedSocketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && resolvedSocketUrl.includes('localhost')) {
+  resolvedSocketUrl = fallbackSocket;
+}
+export const SOCKET_URL = resolvedSocketUrl;

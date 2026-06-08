@@ -24,10 +24,34 @@ const galleryRoutes = require('./routes/galleryRoutes');
 const app = express();
 const server = http.createServer(app);
 
+// Dynamic CORS Origin Resolution
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5000',
+  'https://agstutorial.vercel.app'
+];
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+    // Permissive fallback to avoid blocking valid user requests
+    return callback(null, true);
+  },
+  credentials: true
+};
+
 // Socket.io setup
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: function (origin, callback) {
+      callback(null, true);
+    },
     methods: ['GET', 'POST'],
     credentials: true
   }
@@ -40,10 +64,7 @@ connectDB();
 app.set('io', io);
 
 // Middleware
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true
-}));
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '1100mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));

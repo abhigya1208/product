@@ -53,14 +53,14 @@ export default function HeroSection() {
               <span className="text-sm font-medium text-dark-grey dark:text-gray-200">Admissions Open 2026–27</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-dark-grey dark:text-white leading-tight mb-6">
-              Carving Future –<br />
+              AGS Tutorial<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-500 dark:from-green-400 dark:to-teal-400">
-                One Student
+                Coaching Institute
               </span>{' '}
-              at a Time
+              in Sonia Vihar
             </h1>
             <p className="text-lg text-mid-grey dark:text-gray-400 mb-8 max-w-md">
-              AGS Tutorial provides quality education from Nursery to Class 12 in a nurturing, caring environment. 
+              AGS Tutorial provides quality education from Nursery to Class 12 in a nurturing, caring environment in Delhi.
               <span className="block mt-2 font-semibold text-green-600 dark:text-green-400">100% passing result for board students since opening (2022)</span>
               <span className="block mt-1 text-sm italic text-mid-grey dark:text-gray-400">Every student has passed since the tuition opened in 2022.</span>
             </p>

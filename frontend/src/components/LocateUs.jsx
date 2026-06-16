@@ -1,4 +1,6 @@
 export default function LocateUs() {
+  const mapQuery = encodeURIComponent('AGS Tutorial, A-353, Gali No 8, Part 2, Pusta 1, Sonia Vihar, Delhi 110094');
+
   return (
     <section id="locate" className="py-20 bg-cream dark:bg-gray-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -15,7 +17,7 @@ export default function LocateUs() {
             style={{ border: 0 }}
             loading="lazy"
             allowFullScreen
-            src="https://maps.google.com/maps?q=Sonia+Vihar+Delhi&t=&z=15&ie=UTF8&iwloc=&output=embed"
+            src={`https://maps.google.com/maps?q=${mapQuery}&t=&z=18&ie=UTF8&iwloc=&output=embed`}
           />
         </div>
         <p className="text-center text-sm text-mid-grey dark:text-gray-400 mt-4">

@@ -3,6 +3,8 @@ import HeroSection from '../components/HeroSection';
 import WhyChooseUs from '../components/WhyChooseUs';
 import AboutUs from '../components/AboutUs';
 import FeedbackSection from '../components/FeedbackSection';
+import ContactForm from '../components/ContactForm';
+import LocateUs from '../components/LocateUs';
 import Footer from '../components/Footer';
 import { FEE_STRUCTURE } from '../utils/constants';
 import { Link } from 'react-router-dom';
@@ -47,6 +49,8 @@ export default function LandingPage() {
       <WhyChooseUs />
       <AboutUs />
       <FeedbackSection />
+      <ContactForm />
+      <LocateUs />
       <Footer />
     </div>
   );
